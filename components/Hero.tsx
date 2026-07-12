@@ -41,6 +41,7 @@ export default function Hero({
   const orbY = useSpring(oy, { stiffness: 60, damping: 20 });
 
   function onMouse(e: React.MouseEvent) {
+    if (typeof window === 'undefined') return;
     const { innerWidth: w, innerHeight: h } = window;
     ox.set((e.clientX - w / 2) / w * 60);
     oy.set((e.clientY - h / 2) / h * 60);

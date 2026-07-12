@@ -44,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`}>
+    <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`} suppressHydrationWarning>
       <body className="bg-background text-ink antialiased">
         <div className="mesh-bg" aria-hidden="true">
           <div className="mesh-blob b1" />

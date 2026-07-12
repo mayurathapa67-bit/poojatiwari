@@ -43,11 +43,19 @@ export default function AdminContentPage() {
   const [saving, setSaving] = useState<"draft" | "local" | "publish" | null>(null);
   const [showPreview, setShowPreview] = useState(true);
   const [isProduction, setIsProduction] = useState(false);
+  const [edgeConfigured, setEdgeConfigured] = useState<boolean | null>(null);
 
   useEffect(() => {
     setIsProduction(
       typeof window !== "undefined" && window.location.hostname !== "localhost"
     );
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/admin/status")
+      .then((r) => r.json())
+      .then((res: { isConfigured: boolean }) => setEdgeConfigured(res.isConfigured))
+      .catch(() => setEdgeConfigured(false));
   }, []);
 
   const apiPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
@@ -204,9 +212,13 @@ export default function AdminContentPage() {
             {/* Publish to Edge Config — live production */}
             <button
               onClick={() => save("publish")}
-              disabled={saving !== null}
+              disabled={saving !== null || edgeConfigured === false}
               className="btn-primary"
-              title="Publish to Vercel Edge Config + commit to GitHub"
+              title={
+                edgeConfigured === false
+                  ? "Edge Config not configured — publish unavailable"
+                  : "Publish to Vercel Edge Config + commit to GitHub"
+              }
             >
               {saving === "publish" ? (
                 <Loader2 size={16} className="animate-spin" />
@@ -219,15 +231,25 @@ export default function AdminContentPage() {
         </div>
 
         {/* Production info banner */}
-        {isProduction && (
+        {isProduction && edgeConfigured === false && (
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+            <AlertCircle size={20} className="mt-0.5 shrink-0 text-amber-400" />
+            <div>
+              <p className="text-sm font-semibold text-amber-300">
+                ⚠️ Edge Config not configured — "Publish to Edge Config" will not update the live site.
+              </p>
+              <p className="mt-1 text-xs text-amber-400/80">
+                Set <code className="rounded bg-amber-500/20 px-1 py-0.5 font-mono">EDGE_CONFIG</code> and <code className="rounded bg-amber-500/20 px-1 py-0.5 font-mono">EDGE_CONFIG_TOKEN</code> in Vercel env vars to enable publishing.
+              </p>
+            </div>
+          </div>
+        )}
+        {isProduction && edgeConfigured === true && (
           <div className="mb-6 flex items-start gap-3 rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3">
             <Globe size={20} className="mt-0.5 shrink-0 text-teal-400" />
             <div>
               <p className="text-sm font-semibold text-teal-300">
-                🌐 You are on PRODUCTION — "Publish to Edge Config" will update the live site immediately.
-              </p>
-              <p className="mt-1 text-xs text-teal-400/80">
-                Make sure <code className="rounded bg-teal-500/20 px-1 py-0.5 font-mono">EDGE_CONFIG</code> and <code className="rounded bg-teal-500/20 px-1 py-0.5 font-mono">EDGE_CONFIG_TOKEN</code> are set in Vercel env vars
+                🌐 You are on PRODUCTION — Edge Config is ready. "Publish to Edge Config" will update the live site immediately.
               </p>
             </div>
           </div>
