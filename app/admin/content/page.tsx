@@ -84,30 +84,22 @@ export default function AdminContentPage() {
     setToast(null);
 
     try {
-      // Publish mode: send ALL sections to /api/content (consolidated server-side write)
+      // Publish mode: send ALL sections to /api/content
       if (mode === "publish") {
+        console.log("[admin] Publishing data:", JSON.stringify(data, null, 2));
         const res = await fetch("/api/content", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             password: apiPassword,
             data,
-            publishMode: "publish",
           }),
         });
+        const body = await res.json();
         if (res.ok) {
-          const body = await res.json();
-          // Clear all drafts after successful publish
           setDrafts(new Set());
-
-          const parts: string[] = [];
-          if (body.edge) parts.push("Published to Edge Config");
-          else parts.push("Edge Config publish skipped (token/ID missing)");
-          if (body.github) parts.push("Committed to GitHub — redeploying...");
-          else parts.push("GitHub commit skipped (token/repo missing)");
-          setToast({ type: "success", msg: parts.join(" · ") });
+          setToast({ type: "success", msg: body.message || "Published successfully" });
         } else {
-          const body = await res.json().catch(() => ({}));
           const detail = body.details || body.error || res.statusText;
           setToast({ type: "error", msg: `Publish failed: ${detail}` });
         }

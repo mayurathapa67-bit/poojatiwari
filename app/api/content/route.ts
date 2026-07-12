@@ -38,18 +38,19 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { password, section, data } = body as {
+    console.log("[content] POST body:", JSON.stringify(body, null, 2));
+
+    const { password, data } = body as {
       password?: string;
-      section?: string;
-      data?: unknown;
+      data?: Record<string, unknown>;
     };
 
     if (password !== ADMIN_PASSWORD) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!section || data === undefined) {
-      return NextResponse.json({ error: "Missing section or data" }, { status: 400 });
+    if (!data || typeof data !== "object") {
+      return NextResponse.json({ error: "Missing data payload" }, { status: 400 });
     }
 
     const edgeConfigUrl = process.env.EDGE_CONFIG;
@@ -65,6 +66,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid EDGE_CONFIG format" }, { status: 500 });
     }
 
+    const items = SECTIONS.filter((s) => s in data).map((s) => ({
+      operation: "upsert" as const,
+      key: s,
+      value: data[s],
+    }));
+
+    if (items.length === 0) {
+      return NextResponse.json({ error: "No valid sections found in request" }, { status: 400 });
+    }
+
     const teamId = parsedUrl.searchParams.get("teamId") || process.env.VERCEL_TEAM_ID || "";
     const apiUrl = `https://api.vercel.com/v1/edge-config/${edgeConfigId}/items${teamId ? `?teamId=${teamId}` : ""}`;
     const res = await fetch(apiUrl, {
@@ -73,15 +84,7 @@ export async function POST(request: Request) {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        items: [
-          {
-            operation: "upsert",
-            key: section,
-            value: data,
-          },
-        ],
-      }),
+      body: JSON.stringify({ items }),
     });
 
     if (!res.ok) {
@@ -99,7 +102,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       edge: true,
-      message: `Successfully published ${section} to Edge Config`,
+      message: `Successfully published ${items.length} sections to Edge Config`,
     });
   } catch (err) {
     console.error("[content] POST failed:", err);
