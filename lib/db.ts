@@ -181,7 +181,7 @@ export async function writeDB(
 
   // mode === "all" or "edge"
   if (process.env.EDGE_CONFIG) result.edge = await writeToEdge(data);
-  writeLocal(data);
+  if (!isVercel) writeLocal(data);
   if (mode === "all") {
     result.github = await commitToGitHub(data);
   }

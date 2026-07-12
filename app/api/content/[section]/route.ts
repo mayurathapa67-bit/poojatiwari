@@ -73,13 +73,16 @@ export async function POST(
     (db[section] as PortfolioData[SectionKey]) = data as PortfolioData[SectionKey];
     clearDraft(section);
 
-    // --- Local mode: save to local db.json only ---
+    // --- Local mode: save locally (skip on Vercel — read-only FS) ---
     if (publishMode === "local") {
-      await writeDB(db, "local");
+      const isVercel = process.env.VERCEL === "1" || process.env.VERCEL_ENV != null;
+      if (!isVercel) {
+        await writeDB(db, "local");
+      }
       return NextResponse.json({ success: true, state: "local", edge: false, github: false });
     }
 
-    // --- Publish mode: Edge Config + GitHub + local db.json ---
+    // --- Publish mode: Edge Config + GitHub (no local db.json on Vercel) ---
     const result = await writeDB(db, "all");
 
     const routes: Record<string, string> = {

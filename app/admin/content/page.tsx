@@ -84,39 +84,58 @@ export default function AdminContentPage() {
     setToast(null);
 
     try {
-      const res = await fetch(`/api/content/${active}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          password: apiPassword,
-          data: (data as unknown as Record<string, unknown>)[active],
-          publishMode: mode,
-        }),
-      });
-      if (res.ok) {
-        const body = await res.json();
-        setDrafts((prev) => {
-          const next = new Set(prev);
-          if (mode === "draft") next.add(active);
-          else next.delete(active);
-          return next;
+      // Publish mode: send ALL sections to /api/content (consolidated server-side write)
+      if (mode === "publish") {
+        const res = await fetch("/api/content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            password: apiPassword,
+            data,
+            publishMode: "publish",
+          }),
         });
+        if (res.ok) {
+          const body = await res.json();
+          // Clear all drafts after successful publish
+          setDrafts(new Set());
 
-        if (mode === "publish") {
           const parts: string[] = [];
           if (body.edge) parts.push("Published to Edge Config");
+          else parts.push("Edge Config publish skipped (token/ID missing)");
           if (body.github) parts.push("Committed to GitHub — redeploying...");
-          if (!body.edge && !body.github) {
-            parts.push("Edge Config not configured — set EDGE_CONFIG env var");
-          }
+          else parts.push("GitHub commit skipped (token/repo missing)");
           setToast({ type: "success", msg: parts.join(" · ") });
-        } else if (mode === "local") {
-          setToast({ type: "success", msg: "Saved to local db.json ✅" });
         } else {
-          setToast({ type: "success", msg: "Draft saved locally" });
+          setToast({ type: "error", msg: "Publish failed: unauthorized" });
         }
       } else {
-        setToast({ type: "error", msg: "Save failed: unauthorized" });
+        // Draft / Local mode: save only the active section via per-section endpoint
+        const res = await fetch(`/api/content/${active}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            password: apiPassword,
+            data: (data as unknown as Record<string, unknown>)[active],
+            publishMode: mode,
+          }),
+        });
+        if (res.ok) {
+          setDrafts((prev) => {
+            const next = new Set(prev);
+            if (mode === "draft") next.add(active);
+            else next.delete(active);
+            return next;
+          });
+
+          if (mode === "local") {
+            setToast({ type: "success", msg: "Saved to local db.json ✅" });
+          } else {
+            setToast({ type: "success", msg: "Draft saved locally" });
+          }
+        } else {
+          setToast({ type: "error", msg: "Save failed: unauthorized" });
+        }
       }
     } catch {
       setToast({ type: "error", msg: "Network error" });
