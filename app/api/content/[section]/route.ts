@@ -47,10 +47,10 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { password, data, draft } = body as {
+    const { password, data, publishMode } = body as {
       password?: string;
       data?: unknown;
-      draft?: boolean;
+      publishMode?: "draft" | "local" | "publish";
     };
 
     if (password !== ADMIN_PASSWORD) {
@@ -61,10 +61,10 @@ export async function POST(
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    if (draft) {
+    // --- Draft mode: save to local drafts file only ---
+    if (publishMode === "draft") {
       const drafts = readDrafts();
       (drafts as Record<string, unknown>)[section] = data;
-      // Safe on read-only filesystems: logs instead of throwing.
       writeDrafts(drafts);
       return NextResponse.json({ success: true, state: "draft" });
     }
@@ -72,7 +72,15 @@ export async function POST(
     const db = await readDB();
     (db[section] as PortfolioData[SectionKey]) = data as PortfolioData[SectionKey];
     clearDraft(section);
-    const result = await writeDB(db);
+
+    // --- Local mode: save to local db.json only ---
+    if (publishMode === "local") {
+      await writeDB(db, "local");
+      return NextResponse.json({ success: true, state: "local", edge: false, github: false });
+    }
+
+    // --- Publish mode: Edge Config + GitHub + local db.json ---
+    const result = await writeDB(db, "all");
 
     const routes: Record<string, string> = {
       personalInfo: "/",

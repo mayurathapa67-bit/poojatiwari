@@ -166,14 +166,25 @@ export async function readDB(): Promise<PortfolioData> {
   return readLocal();
 }
 
+export type PublishMode = "all" | "local" | "edge";
+
 export async function writeDB(
-  data: PortfolioData
+  data: PortfolioData,
+  mode: PublishMode = "all"
 ): Promise<{ edge: boolean; github: boolean }> {
   const result = { edge: false, github: false };
 
+  if (mode === "local") {
+    writeLocal(data);
+    return result;
+  }
+
+  // mode === "all" or "edge"
   if (process.env.EDGE_CONFIG) result.edge = await writeToEdge(data);
   writeLocal(data);
-  result.github = await commitToGitHub(data);
+  if (mode === "all") {
+    result.github = await commitToGitHub(data);
+  }
 
   return result;
 }

@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import {
   Save,
-  Upload,
   Loader2,
   CheckCircle2,
   AlertCircle,
+  Globe,
+  FileEdit,
   Eye,
   EyeOff,
   X,
@@ -39,7 +40,7 @@ export default function AdminContentPage() {
   const [drafts, setDrafts] = useState<Set<string>>(new Set());
   const [active, setActive] = useState<SectionKey>("personalInfo");
   const [toast, setToast] = useState<Toast>(null);
-  const [saving, setSaving] = useState<"draft" | "publish" | null>(null);
+  const [saving, setSaving] = useState<"draft" | "local" | "publish" | null>(null);
   const [showPreview, setShowPreview] = useState(true);
   const [isProduction, setIsProduction] = useState(false);
 
@@ -69,10 +70,11 @@ export default function AdminContentPage() {
     });
   }, [authed, data]);
 
-  async function save(mode: "draft" | "publish") {
+  async function save(mode: "draft" | "local" | "publish") {
     if (!data) return;
     setSaving(mode);
     setToast(null);
+
     try {
       const res = await fetch(`/api/content/${active}`, {
         method: "POST",
@@ -80,7 +82,7 @@ export default function AdminContentPage() {
         body: JSON.stringify({
           password: apiPassword,
           data: (data as unknown as Record<string, unknown>)[active],
-          draft: mode === "draft",
+          publishMode: mode,
         }),
       });
       if (res.ok) {
@@ -91,20 +93,19 @@ export default function AdminContentPage() {
           else next.delete(active);
           return next;
         });
+
         if (mode === "publish") {
           const parts: string[] = [];
           if (body.edge) parts.push("Published to Edge Config");
           if (body.github) parts.push("Committed to GitHub — redeploying...");
-          if (!body.edge && !body.github) parts.push("Saved locally (file-based DB)");
-          setToast({
-            type: "success",
-            msg: parts.join(" · "),
-          });
+          if (!body.edge && !body.github) {
+            parts.push("Edge Config not configured — set EDGE_CONFIG env var");
+          }
+          setToast({ type: "success", msg: parts.join(" · ") });
+        } else if (mode === "local") {
+          setToast({ type: "success", msg: "Saved to local db.json ✅" });
         } else {
-          setToast({
-            type: "success",
-            msg: "Draft saved locally",
-          });
+          setToast({ type: "success", msg: "Draft saved locally" });
         }
       } else {
         setToast({ type: "error", msg: "Save failed: unauthorized" });
@@ -170,27 +171,63 @@ export default function AdminContentPage() {
               {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
               {showPreview ? "Hide Preview" : "Live Preview"}
             </button>
-            <button onClick={() => save("draft")} disabled={saving !== null} className="btn-ghost">
-              {saving === "draft" ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            {/* Save Draft — local drafts file only */}
+            <button
+              onClick={() => save("draft")}
+              disabled={saving !== null}
+              className="btn-ghost"
+              title="Save to local drafts folder (no effect on live site)"
+            >
+              {saving === "draft" ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <FileEdit size={16} />
+              )}
               Save Draft
             </button>
-            <button onClick={() => save("publish")} disabled={saving !== null} className="btn-primary">
-              {saving === "publish" ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-              Publish
+
+            {/* Save Locally — db.json only */}
+            <button
+              onClick={() => save("local")}
+              disabled={saving !== null}
+              className="btn-ghost border border-white/10"
+              title="Save to local db.json (no Edge Config or GitHub)"
+            >
+              {saving === "local" ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Save size={16} />
+              )}
+              Save Locally
+            </button>
+
+            {/* Publish to Edge Config — live production */}
+            <button
+              onClick={() => save("publish")}
+              disabled={saving !== null}
+              className="btn-primary"
+              title="Publish to Vercel Edge Config + commit to GitHub"
+            >
+              {saving === "publish" ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Globe size={16} />
+              )}
+              Publish to Edge Config
             </button>
           </div>
         </div>
 
-        {/* Production warning banner */}
+        {/* Production info banner */}
         {isProduction && (
-          <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
-            <AlertCircle size={20} className="mt-0.5 shrink-0 text-amber-400" />
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3">
+            <Globe size={20} className="mt-0.5 shrink-0 text-teal-400" />
             <div>
-              <p className="text-sm font-semibold text-amber-300">
-                ⚠️ You are on PRODUCTION. Admin changes work locally only.
+              <p className="text-sm font-semibold text-teal-300">
+                🌐 You are on PRODUCTION — "Publish to Edge Config" will update the live site immediately.
               </p>
-              <p className="mt-1 text-xs text-amber-400/80">
-                To update the live site: Edit <code className="rounded bg-amber-500/20 px-1 py-0.5 font-mono">data/seed.json</code> locally → Commit → Push to GitHub
+              <p className="mt-1 text-xs text-teal-400/80">
+                Make sure <code className="rounded bg-teal-500/20 px-1 py-0.5 font-mono">EDGE_CONFIG</code> and <code className="rounded bg-teal-500/20 px-1 py-0.5 font-mono">EDGE_CONFIG_TOKEN</code> are set in Vercel env vars
               </p>
             </div>
           </div>
