@@ -1,0 +1,88 @@
+import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
+import { readDB, writeDB, readDrafts, writeDrafts, clearDraft } from "@/lib/db";
+import type { PortfolioData, SectionKey } from "@/lib/types";
+
+export const dynamic = "force-dynamic";
+
+const ADMIN_PASSWORD =
+  process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
+
+const VALID_SECTIONS: SectionKey[] = [
+  "personalInfo",
+  "hero",
+  "about",
+  "experience",
+  "projects",
+  "contact",
+  "socials",
+];
+
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: { section: string } }
+) {
+  const section = params.section as SectionKey;
+  if (!VALID_SECTIONS.includes(section)) {
+    return NextResponse.json({ error: "Invalid section" }, { status: 400 });
+  }
+  const db = readDB();
+  return NextResponse.json(db[section]);
+}
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { section: string } }
+) {
+  try {
+    const section = params.section as SectionKey;
+
+    if (!VALID_SECTIONS.includes(section)) {
+      return NextResponse.json({ error: "Invalid section" }, { status: 400 });
+    }
+
+    const body = await req.json();
+    const { password, data, draft } = body as {
+      password?: string;
+      data?: unknown;
+      draft?: boolean;
+    };
+
+    if (password !== ADMIN_PASSWORD) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (data === undefined) {
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    }
+
+    if (draft) {
+      const drafts = readDrafts();
+      (drafts as Record<string, unknown>)[section] = data;
+      writeDrafts(drafts);
+      return NextResponse.json({ success: true, state: "draft" });
+    }
+
+    const db = readDB();
+    (db[section] as PortfolioData[SectionKey]) = data as PortfolioData[SectionKey];
+    clearDraft(section);
+    writeDB(db);
+
+    const routes: Record<string, string> = {
+      personalInfo: "/",
+      hero: "/",
+      about: "/about",
+      experience: "/experience",
+      projects: "/projects",
+      contact: "/contact",
+    };
+    if (routes[section]) revalidatePath(routes[section]);
+
+    return NextResponse.json({ success: true, state: "published" });
+  } catch {
+    return NextResponse.json(
+      { error: "Failed to update section" },
+      { status: 500 }
+    );
+  }
+}
