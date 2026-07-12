@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { get } from "@vercel/edge-config";
 import type { PortfolioData, SectionKey } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -16,22 +17,6 @@ const VALID_SECTIONS: SectionKey[] = [
   "socials",
 ];
 
-async function readFromEdge(): Promise<PortfolioData | null> {
-  if (!process.env.EDGE_CONFIG) return null;
-  try {
-    const { getAll } = await import("@vercel/edge-config");
-    const all = (await getAll()) as Record<string, unknown>;
-    const result: Record<string, unknown> = {};
-    for (const key of VALID_SECTIONS) {
-      if (all[key] == null) return null;
-      result[key] = all[key];
-    }
-    return result as unknown as PortfolioData;
-  } catch {
-    return null;
-  }
-}
-
 async function readSeed(): Promise<PortfolioData> {
   try {
     const { default: seed } = await import("@/data/seed.json");
@@ -44,11 +29,25 @@ async function readSeed(): Promise<PortfolioData> {
 export async function GET() {
   try {
     if (process.env.EDGE_CONFIG) {
-      const edge = await readFromEdge();
-      if (edge) return NextResponse.json(edge);
+      const sections = VALID_SECTIONS;
+      const allData: Record<string, unknown> = {};
+      let allPresent = true;
+      for (const s of sections) {
+        try {
+          const val = await get(s);
+          if (val == null) { allPresent = false; break; }
+          allData[s] = val;
+        } catch {
+          allPresent = false;
+          break;
+        }
+      }
+      if (allPresent) {
+        return NextResponse.json(allData as unknown as PortfolioData);
+      }
     }
-    const seed = await readSeed();
-    return NextResponse.json(seed);
+    const { default: seed } = await import("@/data/seed.json");
+    return NextResponse.json(seed as PortfolioData);
   } catch (err) {
     console.error("[content] GET failed:", err);
     return NextResponse.json({} as PortfolioData, { status: 200 });
@@ -97,9 +96,7 @@ export async function POST(req: NextRequest) {
     }
 
     const teamId = process.env.VERCEL_TEAM_ID;
-    const url = `https://api.vercel.com/v1/edge-config/${id}/items${
-      teamId ? `?teamId=${teamId}` : ""
-    }`;
+    const url = `https://api.vercel.com/v1/edge-config/${id}/items${teamId ? `?teamId=${teamId}` : ""}`;
     const res = await fetch(url, {
       method: "PATCH",
       headers: {
@@ -110,9 +107,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (!res.ok) {
-      console.error("[content] Edge Config write failed:", res.status);
+      const errorText = await res.text().catch(() => "");
+      console.error("[content] Edge Config write failed:", res.status, errorText);
       return NextResponse.json(
-        { error: "Failed to publish to Edge Config" },
+        {
+          error: "Failed to publish to Edge Config",
+          status: res.status,
+          details: errorText,
+        },
         { status: 500 }
       );
     }
@@ -120,12 +122,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       updated: items.length,
+      edge: true,
+      github: false,
       message: "Published to Edge Config",
     });
   } catch (err) {
     console.error("[content] POST failed:", err);
     return NextResponse.json(
-      { error: "Failed to publish to Edge Config" },
+      {
+        error: "Failed to publish to Edge Config",
+        details: err instanceof Error ? err.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

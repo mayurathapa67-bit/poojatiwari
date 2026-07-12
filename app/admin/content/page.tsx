@@ -107,7 +107,9 @@ export default function AdminContentPage() {
           else parts.push("GitHub commit skipped (token/repo missing)");
           setToast({ type: "success", msg: parts.join(" · ") });
         } else {
-          setToast({ type: "error", msg: "Publish failed: unauthorized" });
+          const body = await res.json().catch(() => ({}));
+          const detail = body.details || body.error || res.statusText;
+          setToast({ type: "error", msg: `Publish failed: ${detail}` });
         }
       } else {
         // Draft / Local mode: save only the active section via per-section endpoint
