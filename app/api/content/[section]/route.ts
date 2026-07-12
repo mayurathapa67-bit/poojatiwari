@@ -26,8 +26,14 @@ export async function GET(
   if (!VALID_SECTIONS.includes(section)) {
     return NextResponse.json({ error: "Invalid section" }, { status: 400 });
   }
-  const db = readDB();
-  return NextResponse.json(db[section]);
+  try {
+    // readDB() falls back to seed.json when db.json is unavailable.
+    const db = readDB();
+    return NextResponse.json(db[section]);
+  } catch (err) {
+    console.error("[content/section] GET failed:", err);
+    return NextResponse.json({}, { status: 200 });
+  }
 }
 
 export async function POST(
@@ -59,6 +65,7 @@ export async function POST(
     if (draft) {
       const drafts = readDrafts();
       (drafts as Record<string, unknown>)[section] = data;
+      // Safe on read-only filesystems: logs instead of throwing.
       writeDrafts(drafts);
       return NextResponse.json({ success: true, state: "draft" });
     }
@@ -66,6 +73,7 @@ export async function POST(
     const db = readDB();
     (db[section] as PortfolioData[SectionKey]) = data as PortfolioData[SectionKey];
     clearDraft(section);
+    // Safe on read-only filesystems: logs instead of throwing.
     writeDB(db);
 
     const routes: Record<string, string> = {
@@ -79,7 +87,8 @@ export async function POST(
     if (routes[section]) revalidatePath(routes[section]);
 
     return NextResponse.json({ success: true, state: "published" });
-  } catch {
+  } catch (err) {
+    console.error("[content/section] POST failed:", err);
     return NextResponse.json(
       { error: "Failed to update section" },
       { status: 500 }

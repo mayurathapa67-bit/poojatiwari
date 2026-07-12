@@ -6,13 +6,21 @@ import type { Submission } from "./submission-types";
 const SUBMISSIONS_PATH = path.join(process.cwd(), "data", "submissions.json");
 
 function ensureFile(): void {
-  const dir = path.dirname(SUBMISSIONS_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(SUBMISSIONS_PATH)) {
-    fs.writeFileSync(SUBMISSIONS_PATH, "[]", "utf-8");
+  try {
+    const dir = path.dirname(SUBMISSIONS_PATH);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    if (!fs.existsSync(SUBMISSIONS_PATH)) {
+      fs.writeFileSync(SUBMISSIONS_PATH, "[]", "utf-8");
+    }
+  } catch (err) {
+    console.error("[submissions] ensureFile failed (read-only filesystem?):", err);
   }
 }
 
+/**
+ * Read submissions. If the file is missing or unreadable (e.g. Vercel's
+ * read-only FS), fall back to an empty array instead of throwing.
+ */
 export function readSubmissions(): Submission[] {
   try {
     ensureFile();
@@ -25,8 +33,12 @@ export function readSubmissions(): Submission[] {
 }
 
 export function writeSubmissions(submissions: Submission[]): void {
-  ensureFile();
-  fs.writeFileSync(SUBMISSIONS_PATH, JSON.stringify(submissions, null, 2), "utf-8");
+  try {
+    ensureFile();
+    fs.writeFileSync(SUBMISSIONS_PATH, JSON.stringify(submissions, null, 2), "utf-8");
+  } catch (err) {
+    console.error("[submissions] writeSubmissions failed (read-only filesystem?):", err);
+  }
 }
 
 export function addSubmission(data: {

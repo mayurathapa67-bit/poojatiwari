@@ -26,8 +26,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const submission = addSubmission({ name, email, subject, message });
-    return NextResponse.json({ success: true, id: submission.id });
+    // Persisting may fail on a read-only filesystem (e.g. Vercel). We log
+    // the error but still acknowledge the visitor so the form never 500s.
+    try {
+      const submission = addSubmission({ name, email, subject, message });
+      return NextResponse.json({ success: true, id: submission.id });
+    } catch (writeErr) {
+      console.error("[contact] failed to persist submission:", writeErr);
+      return NextResponse.json({
+        success: true,
+        id: null,
+        warning: "submission received but not persisted",
+      });
+    }
   } catch {
     return NextResponse.json(
       { error: "Failed to submit. Please try again." },

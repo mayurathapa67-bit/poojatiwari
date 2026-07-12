@@ -11,8 +11,16 @@ export async function GET(req: NextRequest) {
   if (password !== ADMIN_PASSWORD) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const submissions = readSubmissions().sort((a, b) =>
-    b.timestamp.localeCompare(a.timestamp)
-  );
-  return NextResponse.json(submissions);
+
+  try {
+    // readSubmissions() falls back to an empty array when the file is
+    // missing or unreadable, so this never 500s on a read-only FS.
+    const submissions = readSubmissions().sort((a, b) =>
+      b.timestamp.localeCompare(a.timestamp)
+    );
+    return NextResponse.json(submissions);
+  } catch (err) {
+    console.error("[submissions] GET failed:", err);
+    return NextResponse.json([], { status: 200 });
+  }
 }

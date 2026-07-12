@@ -18,8 +18,15 @@ const VALID_SECTIONS: SectionKey[] = [
 ];
 
 export async function GET() {
-  const data = readDB();
-  return NextResponse.json(data);
+  try {
+    // readDB() falls back to seed.json when db.json is unavailable,
+    // so this can never 500 just because a file is missing.
+    const data = readDB();
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error("[content] GET failed:", err);
+    return NextResponse.json({} as PortfolioData, { status: 200 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -54,9 +61,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Safe on read-only filesystems: logs instead of throwing.
     writeDB(db);
     return NextResponse.json({ success: true, updated });
-  } catch {
+  } catch (err) {
+    console.error("[content] POST failed:", err);
     return NextResponse.json(
       { error: "Failed to update database" },
       { status: 500 }
