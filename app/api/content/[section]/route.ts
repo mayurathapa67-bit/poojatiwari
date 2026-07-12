@@ -27,8 +27,7 @@ export async function GET(
     return NextResponse.json({ error: "Invalid section" }, { status: 400 });
   }
   try {
-    // readDB() falls back to seed.json when db.json is unavailable.
-    const db = readDB();
+    const db = await readDB();
     return NextResponse.json(db[section]);
   } catch (err) {
     console.error("[content/section] GET failed:", err);
@@ -70,11 +69,10 @@ export async function POST(
       return NextResponse.json({ success: true, state: "draft" });
     }
 
-    const db = readDB();
+    const db = await readDB();
     (db[section] as PortfolioData[SectionKey]) = data as PortfolioData[SectionKey];
     clearDraft(section);
-    // Safe on read-only filesystems: logs instead of throwing.
-    writeDB(db);
+    const result = await writeDB(db);
 
     const routes: Record<string, string> = {
       personalInfo: "/",
@@ -86,7 +84,7 @@ export async function POST(
     };
     if (routes[section]) revalidatePath(routes[section]);
 
-    return NextResponse.json({ success: true, state: "published" });
+    return NextResponse.json({ success: true, state: "published", ...result });
   } catch (err) {
     console.error("[content/section] POST failed:", err);
     return NextResponse.json(

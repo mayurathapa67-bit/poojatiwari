@@ -41,6 +41,13 @@ export default function AdminContentPage() {
   const [toast, setToast] = useState<Toast>(null);
   const [saving, setSaving] = useState<"draft" | "publish" | null>(null);
   const [showPreview, setShowPreview] = useState(true);
+  const [isProduction, setIsProduction] = useState(false);
+
+  useEffect(() => {
+    setIsProduction(
+      typeof window !== "undefined" && window.location.hostname !== "localhost"
+    );
+  }, []);
 
   const apiPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
 
@@ -77,16 +84,28 @@ export default function AdminContentPage() {
         }),
       });
       if (res.ok) {
+        const body = await res.json();
         setDrafts((prev) => {
           const next = new Set(prev);
           if (mode === "draft") next.add(active);
           else next.delete(active);
           return next;
         });
-        setToast({
-          type: "success",
-          msg: mode === "draft" ? "Draft saved" : "Published to live site",
-        });
+        if (mode === "publish") {
+          const parts: string[] = [];
+          if (body.edge) parts.push("Published to Edge Config");
+          if (body.github) parts.push("Committed to GitHub — redeploying...");
+          if (!body.edge && !body.github) parts.push("Saved locally (file-based DB)");
+          setToast({
+            type: "success",
+            msg: parts.join(" · "),
+          });
+        } else {
+          setToast({
+            type: "success",
+            msg: "Draft saved locally",
+          });
+        }
       } else {
         setToast({ type: "error", msg: "Save failed: unauthorized" });
       }
@@ -161,6 +180,21 @@ export default function AdminContentPage() {
             </button>
           </div>
         </div>
+
+        {/* Production warning banner */}
+        {isProduction && (
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+            <AlertCircle size={20} className="mt-0.5 shrink-0 text-amber-400" />
+            <div>
+              <p className="text-sm font-semibold text-amber-300">
+                ⚠️ You are on PRODUCTION. Admin changes work locally only.
+              </p>
+              <p className="mt-1 text-xs text-amber-400/80">
+                To update the live site: Edit <code className="rounded bg-amber-500/20 px-1 py-0.5 font-mono">data/seed.json</code> locally → Commit → Push to GitHub
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-6 lg:flex-row">
           {/* Section nav */}

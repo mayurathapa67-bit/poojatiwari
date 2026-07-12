@@ -19,9 +19,7 @@ const VALID_SECTIONS: SectionKey[] = [
 
 export async function GET() {
   try {
-    // readDB() falls back to seed.json when db.json is unavailable,
-    // so this can never 500 just because a file is missing.
-    const data = readDB();
+    const data = await readDB();
     return NextResponse.json(data);
   } catch (err) {
     console.error("[content] GET failed:", err);
@@ -43,9 +41,7 @@ export async function POST(req: NextRequest) {
 
     if (!data || typeof data !== "object") {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
-    }
-
-    const db = readDB();
+    }    const db = await readDB();
     let updated = 0;
     for (const key of Object.keys(data) as SectionKey[]) {
       if (VALID_SECTIONS.includes(key)) {
@@ -61,9 +57,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Safe on read-only filesystems: logs instead of throwing.
-    writeDB(db);
-    return NextResponse.json({ success: true, updated });
+    const result = await writeDB(db);
+    return NextResponse.json({ success: true, updated, ...result });
   } catch (err) {
     console.error("[content] POST failed:", err);
     return NextResponse.json(
