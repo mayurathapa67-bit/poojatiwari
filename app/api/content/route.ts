@@ -32,79 +32,56 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  let getResponse: Response | undefined
-  let commitResponse: Response | undefined
-
   try {
     const body = await request.json()
-
-    console.log('[API] Environment check:', {
-      hasGithubToken: !!process.env.GITHUB_TOKEN,
-      githubRepo: process.env.GITHUB_REPO,
-      githubBranch: process.env.GITHUB_BRANCH || 'main',
-      bodyKeys: Object.keys(body),
-      nodeEnv: process.env.NODE_ENV,
-      vercelEnv: process.env.VERCEL_ENV,
-    })
+    console.log('[API] Starting publish process')
 
     const githubToken = process.env.GITHUB_TOKEN
     const githubRepo = process.env.GITHUB_REPO
     const githubBranch = process.env.GITHUB_BRANCH || 'main'
 
-    if (!githubToken) {
-      console.error('[API] Missing GITHUB_TOKEN environment variable')
+    console.log('[API] Environment check:', {
+      hasGithubToken: !!githubToken,
+      tokenStartsWith: githubToken?.substring(0, 10) + '...',
+      githubRepo: githubRepo,
+      githubBranch: githubBranch
+    })
+
+    if (!githubToken || !githubRepo) {
       return NextResponse.json({
         error: 'GitHub credentials not configured',
-        details: 'GITHUB_TOKEN is not set. Add it to your environment variables.',
-        missing: ['GITHUB_TOKEN']
+        hasToken: !!githubToken,
+        hasRepo: !!githubRepo
       }, { status: 500 })
     }
 
-    if (!githubRepo) {
-      console.error('[API] Missing GITHUB_REPO environment variable')
-      return NextResponse.json({
-        error: 'GitHub credentials not configured',
-        details: 'GITHUB_REPO is not set. Add it as owner/repo format.',
-        missing: ['GITHUB_REPO']
-      }, { status: 500 })
-    }
+    const url = `https://api.github.com/repos/${githubRepo}/contents/data/seed.json?ref=${githubBranch}`
+    console.log('[API] Fetching from:', url)
 
-    const repoUrl = `https://api.github.com/repos/${githubRepo}/contents/data/seed.json?ref=${githubBranch}`
-    console.log('[API] Fetching current seed.json from GitHub:', { repo: githubRepo, branch: githubBranch })
-
-    getResponse = await fetch(
-      repoUrl,
-      {
-        headers: {
-          'Authorization': `token ${githubToken}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'portfolio-admin',
-        }
+    const getResponse = await fetch(url, {
+      headers: {
+        'Authorization': `token ${githubToken}`,
+        'Accept': 'application/vnd.github.v3+json'
       }
-    )
+    })
+
+    console.log('[API] GitHub response status:', getResponse.status, getResponse.statusText)
 
     if (!getResponse.ok) {
       const errorText = await getResponse.text()
-      console.error('[API] GitHub GET failed:', {
+      console.error('[API] GitHub API error:', {
         status: getResponse.status,
         statusText: getResponse.statusText,
-        body: errorText,
-        url: repoUrl.replace(githubToken, '***'),
+        body: errorText
       })
       return NextResponse.json({
         error: 'Failed to fetch current seed.json from GitHub',
-        details: `GitHub API returned ${getResponse.status} ${getResponse.statusText}`,
         githubStatus: getResponse.status,
-        githubError: errorText,
+        githubError: errorText
       }, { status: 500 })
     }
 
     const currentFile = await getResponse.json()
-    console.log('[API] Got current seed.json from GitHub:', {
-      sha: currentFile.sha,
-      size: currentFile.size,
-    })
-
     const currentContent = Buffer.from(currentFile.content, 'base64').toString('utf-8')
     let currentData: Record<string, unknown>
     try {
@@ -128,22 +105,14 @@ export async function POST(request: Request) {
     const newContent = JSON.stringify(cleanedData, null, 2)
     const newContentBase64 = Buffer.from(newContent).toString('base64')
 
-    const commitUrl = `https://api.github.com/repos/${githubRepo}/contents/data/seed.json`
-    console.log('[API] Committing updated seed.json to GitHub:', {
-      branch: githubBranch,
-      sha: currentFile.sha,
-      contentSize: newContent.length,
-    })
-
-    commitResponse = await fetch(
-      commitUrl,
+    const commitResponse = await fetch(
+      `https://api.github.com/repos/${githubRepo}/contents/data/seed.json`,
       {
         method: 'PUT',
         headers: {
           'Authorization': `token ${githubToken}`,
           'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json',
-          'User-Agent': 'portfolio-admin',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           message: 'Update portfolio content via admin panel',
@@ -160,24 +129,16 @@ export async function POST(request: Request) {
         status: commitResponse.status,
         statusText: commitResponse.statusText,
         body: errorText,
-        url: commitUrl,
-        sha: currentFile.sha,
-        branch: githubBranch,
       })
       return NextResponse.json({
         error: 'Failed to commit to GitHub',
-        details: `GitHub API returned ${commitResponse.status} ${commitResponse.statusText}`,
         githubStatus: commitResponse.status,
         githubError: errorText,
       }, { status: 500 })
     }
 
     const commitResult = await commitResponse.json()
-    console.log('[API] Successfully committed to GitHub:', {
-      sha: commitResult.commit?.sha,
-      htmlUrl: commitResult.commit?.html_url,
-      message: commitResult.commit?.message,
-    })
+    console.log('[API] Successfully committed to GitHub:', commitResult.commit?.sha)
 
     return NextResponse.json({
       success: true,
@@ -185,20 +146,10 @@ export async function POST(request: Request) {
       commitSha: commitResult.commit?.sha,
     })
   } catch (error) {
-    console.error('[API] Publish error (unexpected):', {
-      error,
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      getStatus: getResponse?.status,
-      getStatusText: getResponse?.statusText,
-      commitStatus: commitResponse?.status,
-      commitStatusText: commitResponse?.statusText,
-    })
+    console.error('[API] Publish error:', error)
     return NextResponse.json({
       error: 'Failed to publish',
-      details: error instanceof Error ? error.message : 'Unknown error',
-      ...(getResponse ? { getStatus: getResponse.status } : {}),
-      ...(commitResponse ? { commitStatus: commitResponse.status } : {}),
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }
