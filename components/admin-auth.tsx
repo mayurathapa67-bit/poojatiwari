@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Lock, AlertCircle, ShieldCheck } from "lucide-react";
 
 const AUTH_KEY = "portfolio_admin_session";
@@ -10,15 +10,18 @@ export const ADMIN_PASSWORD =
   process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
 
 export function useAdminAuth() {
-  const [authed, setAuthed] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
+  const [authed, setAuthed] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
     const hasCookie = document.cookie
       .split(";")
       .some((c) => c.trim().startsWith(`${AUTH_KEY}=`));
-    return !!localStorage.getItem(AUTH_KEY) || hasCookie;
-  });
-  const [passwordInput, setPasswordInput] = useState("");
-  const [error, setError] = useState("");
+    if (localStorage.getItem(AUTH_KEY) || hasCookie) {
+      setAuthed(true);
+    }
+  }, []);
 
   const login = useCallback((pw: string) => {
     if (pw === ADMIN_PASSWORD) {

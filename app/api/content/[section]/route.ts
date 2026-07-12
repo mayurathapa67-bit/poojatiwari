@@ -61,7 +61,6 @@ export async function POST(
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    // --- Draft mode: save to local drafts file only ---
     if (publishMode === "draft") {
       const drafts = readDrafts();
       (drafts as Record<string, unknown>)[section] = data;
@@ -73,16 +72,14 @@ export async function POST(
     (db[section] as PortfolioData[SectionKey]) = data as PortfolioData[SectionKey];
     clearDraft(section);
 
-    // --- Local mode: save locally (skip on Vercel — read-only FS) ---
     if (publishMode === "local") {
       const isVercel = process.env.VERCEL === "1" || process.env.VERCEL_ENV != null;
       if (!isVercel) {
         await writeDB(db, "local");
       }
-      return NextResponse.json({ success: true, state: "local", edge: false, github: false });
+      return NextResponse.json({ success: true, state: "local", github: false });
     }
 
-    // --- Publish mode: Edge Config + GitHub (no local db.json on Vercel) ---
     const result = await writeDB(db, "all");
 
     const routes: Record<string, string> = {

@@ -58,9 +58,7 @@
       "link": "https://",
       "image": {
         "original": "/uploads/projects/project1.jpg",
-        "thumb": "/uploads/projects/project1-thumb.jpg",
-        "medium": "/uploads/projects/project1-medium.jpg",
-        "large": "/uploads/projects/project1-large.jpg"
+        "thumb": "/uploads/projects/project1-thumb.jpg"
       }
     },
     {
@@ -75,9 +73,7 @@
       "link": "https://",
       "image": {
         "original": "/uploads/projects/project2.jpg",
-        "thumb": "/uploads/projects/project2-thumb.jpg",
-        "medium": "/uploads/projects/project2-medium.jpg",
-        "large": "/uploads/projects/project2-large.jpg"
+        "thumb": "/uploads/projects/project2-thumb.jpg"
       }
     }
   ],
@@ -92,88 +88,5 @@
     "github": "https://github.com/username",
     "linkedin": "https://linkedin.com/in/username",
     "twitter": "https://twitter.com/username"
-  },
-  "password": "Pooja_Tiw@ri321",
-  "data": {
-    "personalInfo": {
-      "name": "Pooja Tiwari \"🎉",
-      "profession": "AI Solutions Architect & Full-Stack Developer",
-      "phone": "+61 482 082 975",
-      "email": "pooja.writer10@gmail.com",
-      "locationAU": "Melbourne",
-      "locationNP": "Jhapa",
-      "bio": "AI Solutions Architect & Full-Stack Developer crafting intelligent, scalable products at the intersection of machine learning and modern web engineering.",
-      "avatar": {
-        "original": "/uploads/profile-1783820801240-ccrhz8.jpg",
-        "thumb": "/uploads/profile-1783820801240-ccrhz8-thumb.jpg"
-      }
-    },
-    "hero": {
-      "title": "Building Intelligent Solutions",
-      "subtitle": "Full-Stack Developer & AI Architect",
-      "ctaText": "Here is my work"
-    },
-    "about": {
-      "heading": "About Me",
-      "description": "I'm Pooja Tiwari, an AI Solutions Architect and Full-Stack Developer based between Melbourne and Jhapa. I design and ship end-to-end intelligent systems — from data pipelines and model serving to polished, responsive frontends. I care about clean architecture, measurable impact, and delightful user experiences.",
-      "skills": [
-        "React",
-        "Next.js",
-        "TypeScript",
-        "Python",
-        "AI/ML",
-        "Node.js"
-      ]
-    },
-    "experience": [
-      {
-        "id": 1,
-        "company": "Nexus AI Labs",
-        "position": "AI Solutions Architect",
-        "duration": "2022 - Present",
-        "description": "Lead the design of production ML systems and full-stack platforms serving thousands of users."
-      },
-      {
-        "id": 2,
-        "company": "Brightwave Technologies",
-        "position": "Senior Full-Stack Developer",
-        "duration": "2020 - 2022",
-        "description": "Built scalable web applications and internal tooling using React, Next.js and Python."
-      }
-    ],
-    "projects": [
-      {
-        "id": 1,
-        "title": "The project is coming soon!",
-        "description": "",
-        "tech": [],
-        "link": "",
-        "image": {
-          "original": ""
-        }
-      },
-      {
-        "id": 2,
-        "title": "coming soon!",
-        "description": "",
-        "tech": [],
-        "link": "",
-        "image": {
-          "original": ""
-        }
-      }
-    ],
-    "contact": {
-      "heading": "Get In Touch",
-      "email": "pooja.writer10@gmail.com",
-      "phone": "+61 482 082 975",
-      "locationAU": "Melbourne",
-      "locationNP": "Jhapa"
-    },
-    "socials": {
-      "github": "https://github.com/username",
-      "linkedin": "https://linkedin.com/in/username",
-      "twitter": "https://twitter.com/username"
-    }
   }
 }

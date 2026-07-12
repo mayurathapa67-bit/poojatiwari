@@ -43,7 +43,7 @@ export default function AdminContentPage() {
   const [saving, setSaving] = useState<"draft" | "local" | "publish" | null>(null);
   const [showPreview, setShowPreview] = useState(true);
   const [isProduction, setIsProduction] = useState(false);
-  const [edgeConfigured, setEdgeConfigured] = useState<boolean | null>(null);
+  const [githubConfigured, setGithubConfigured] = useState<boolean | null>(null);
 
   useEffect(() => {
     setIsProduction(
@@ -54,8 +54,8 @@ export default function AdminContentPage() {
   useEffect(() => {
     fetch("/api/admin/status")
       .then((r) => r.json())
-      .then((res: { isConfigured: boolean }) => setEdgeConfigured(res.isConfigured))
-      .catch(() => setEdgeConfigured(false));
+      .then((res: { isConfigured: boolean }) => setGithubConfigured(res.isConfigured))
+      .catch(() => setGithubConfigured(false));
   }, []);
 
   const apiPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
@@ -84,7 +84,6 @@ export default function AdminContentPage() {
     setToast(null);
 
     try {
-      // Publish mode: send ALL sections to /api/content
       if (mode === "publish") {
         console.log("[admin] Publishing data:", JSON.stringify(data, null, 2));
         const res = await fetch("/api/content", {
@@ -96,12 +95,14 @@ export default function AdminContentPage() {
           }),
         });
         const body = await res.json();
-        if (res.ok) {
+        if (body.success) {
           setDrafts(new Set());
-          setToast({ type: "success", msg: body.message || "Published successfully" });
+          setToast({
+            type: "success",
+            msg: "✅ Published! Changes committed to GitHub. Vercel will redeploy in 1-2 minutes."
+          });
         } else {
-          const detail = body.details || body.error || res.statusText;
-          setToast({ type: "error", msg: `Publish failed: ${detail}` });
+          setToast({ type: "error", msg: `❌ Publish failed: ${body.error || body.details || 'Unknown error'}` });
         }
       } else {
         // Draft / Local mode: save only the active section via per-section endpoint
@@ -212,7 +213,7 @@ export default function AdminContentPage() {
               onClick={() => save("local")}
               disabled={saving !== null}
               className="btn-ghost border border-white/10"
-              title="Save to local db.json (no Edge Config or GitHub)"
+              title="Save to local db.json (no GitHub commit)"
             >
               {saving === "local" ? (
                 <Loader2 size={16} className="animate-spin" />
@@ -222,15 +223,15 @@ export default function AdminContentPage() {
               Save Locally
             </button>
 
-            {/* Publish to Edge Config — live production */}
+            {/* Publish to GitHub — triggers Vercel redeploy */}
             <button
               onClick={() => save("publish")}
-              disabled={saving !== null || edgeConfigured === false}
+              disabled={saving !== null || githubConfigured === false}
               className="btn-primary"
               title={
-                edgeConfigured === false
-                  ? "Edge Config not configured — publish unavailable"
-                  : "Publish to Vercel Edge Config + commit to GitHub"
+                githubConfigured === false
+                  ? "GitHub not configured — publish unavailable"
+                  : "Commit to GitHub → Vercel auto-redeploys"
               }
             >
               {saving === "publish" ? (
@@ -238,31 +239,30 @@ export default function AdminContentPage() {
               ) : (
                 <Globe size={16} />
               )}
-              Publish to Edge Config
+              Publish to GitHub
             </button>
           </div>
         </div>
 
-        {/* Production info banner */}
-        {isProduction && edgeConfigured === false && (
+        {isProduction && githubConfigured === false && (
           <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
             <AlertCircle size={20} className="mt-0.5 shrink-0 text-amber-400" />
             <div>
               <p className="text-sm font-semibold text-amber-300">
-                ⚠️ Edge Config not configured — "Publish to Edge Config" will not update the live site.
+                ⚠️ GitHub not configured — "Publish to GitHub" will not update the live site.
               </p>
               <p className="mt-1 text-xs text-amber-400/80">
-                Set <code className="rounded bg-amber-500/20 px-1 py-0.5 font-mono">EDGE_CONFIG</code> and <code className="rounded bg-amber-500/20 px-1 py-0.5 font-mono">EDGE_CONFIG_TOKEN</code> in Vercel env vars to enable publishing.
+                Set <code className="rounded bg-amber-500/20 px-1 py-0.5 font-mono">GITHUB_TOKEN</code> and <code className="rounded bg-amber-500/20 px-1 py-0.5 font-mono">GITHUB_REPO</code> in your Vercel project env vars to enable publishing.
               </p>
             </div>
           </div>
         )}
-        {isProduction && edgeConfigured === true && (
+        {isProduction && githubConfigured === true && (
           <div className="mb-6 flex items-start gap-3 rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3">
             <Globe size={20} className="mt-0.5 shrink-0 text-teal-400" />
             <div>
               <p className="text-sm font-semibold text-teal-300">
-                🌐 You are on PRODUCTION — Edge Config is ready. "Publish to Edge Config" will update the live site immediately.
+                🌐 You are on PRODUCTION — GitHub is configured. "Publish to GitHub" will commit changes and Vercel will auto-redeploy.
               </p>
             </div>
           </div>

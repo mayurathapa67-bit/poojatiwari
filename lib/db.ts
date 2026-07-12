@@ -17,64 +17,8 @@ export const SECTION_KEYS: SectionKey[] = [
   "socials",
 ];
 
-/** True when running on Vercel (reads come from the committed seed.json). */
 const isVercel =
   process.env.VERCEL === "1" || process.env.VERCEL_ENV != null;
-
-/* ----------------------------- Edge Config ----------------------------- */
-
-async function readFromEdge(): Promise<PortfolioData | null> {
-  if (!process.env.EDGE_CONFIG) return null;
-  try {
-    const { getAll } = await import("@vercel/edge-config");
-    const all = (await getAll()) as Record<string, unknown>;
-    const result: Record<string, unknown> = {};
-    for (const key of SECTION_KEYS) {
-      if (all[key] == null) return null; // incomplete config -> fall through
-      result[key] = all[key];
-    }
-    return result as unknown as PortfolioData;
-  } catch (e) {
-    console.error("[db] Edge Config read failed:", e);
-    return null;
-  }
-}
-
-/** Write via the Vercel REST API (requires EDGE_CONFIG_TOKEN + EDGE_CONFIG_ID). */
-async function writeToEdge(data: PortfolioData): Promise<boolean> {
-  const conn = process.env.EDGE_CONFIG;
-  const token = process.env.EDGE_CONFIG_TOKEN;
-  const idMatch = conn?.match(/ecfg_[a-z0-9]+/i);
-  const id = idMatch?.[0] || process.env.EDGE_CONFIG_ID;
-  if (!id || !token) return false;
-  try {
-    const items = SECTION_KEYS.map((key) => ({
-      op: "update" as const,
-      key,
-      value: data[key],
-    }));
-    const teamId = process.env.VERCEL_TEAM_ID;
-    const url = `https://api.vercel.com/v1/edge-config/${id}/items${
-      teamId ? `?teamId=${teamId}` : ""
-    }`;
-    const res = await fetch(url, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ items }),
-    });
-    if (!res.ok) {
-      console.error("[db] Edge Config write failed:", res.status);
-      return false;
-    }
-    return true;
-  } catch (e) {
-    console.error("[db] Edge Config write error:", e);
-    return false;
-  }
-}
 
 /* ------------------------------- Local files ------------------------------ */
 
@@ -113,7 +57,7 @@ function writeLocal(data: PortfolioData): void {
 
 async function commitToGitHub(data: PortfolioData): Promise<boolean> {
   const token = process.env.GITHUB_TOKEN;
-  const repo = process.env.GITHUB_REPO; // "owner/repo"
+  const repo = process.env.GITHUB_REPO;
   if (!token || !repo) return false;
 
   const [owner, name] = repo.split("/");
@@ -159,32 +103,24 @@ async function commitToGitHub(data: PortfolioData): Promise<boolean> {
 /* ------------------------------- Public API ------------------------------ */
 
 export async function readDB(): Promise<PortfolioData> {
-  if (process.env.EDGE_CONFIG) {
-    const edge = await readFromEdge();
-    if (edge) return edge;
-  }
   return readLocal();
 }
 
-export type PublishMode = "all" | "local" | "edge";
+export type PublishMode = "all" | "local";
 
 export async function writeDB(
   data: PortfolioData,
   mode: PublishMode = "all"
-): Promise<{ edge: boolean; github: boolean }> {
-  const result = { edge: false, github: false };
+): Promise<{ github: boolean }> {
+  const result = { github: false };
 
   if (mode === "local") {
     writeLocal(data);
     return result;
   }
 
-  // mode === "all" or "edge"
-  if (process.env.EDGE_CONFIG) result.edge = await writeToEdge(data);
   if (!isVercel) writeLocal(data);
-  if (mode === "all") {
-    result.github = await commitToGitHub(data);
-  }
+  result.github = await commitToGitHub(data);
 
   return result;
 }
