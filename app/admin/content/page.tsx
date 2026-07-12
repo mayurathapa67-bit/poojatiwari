@@ -89,10 +89,7 @@ export default function AdminContentPage() {
         const res = await fetch("/api/content", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            password: apiPassword,
-            data,
-          }),
+          body: JSON.stringify(data),
         });
         const body = await res.json();
         if (body.success) {
