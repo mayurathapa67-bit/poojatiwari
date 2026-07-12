@@ -5,18 +5,15 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   const edgeConfigUrl = process.env.EDGE_CONFIG;
-  const edgeConfigToken = process.env.EDGE_CONFIG_TOKEN;
 
   const debugInfo: Record<string, unknown> = {
     hasEdgeConfig: !!edgeConfigUrl,
     edgeConfigPreview: edgeConfigUrl ? edgeConfigUrl.substring(0, 50) + "..." : null,
-    hasEdgeConfigToken: !!edgeConfigToken,
-    tokenPreview: edgeConfigToken ? edgeConfigToken.substring(0, 20) + "..." : null,
-    hasEdgeConfigId: !!process.env.EDGE_CONFIG_ID,
     nodeEnv: process.env.NODE_ENV,
     vercelEnv: process.env.VERCEL_ENV,
   };
 
+  // Test read via SDK
   try {
     const testData = await get("test");
     debugInfo.edgeConfigRead = "success";
@@ -26,32 +23,41 @@ export async function GET() {
     debugInfo.readError = error instanceof Error ? error.message : "Unknown error";
   }
 
+  // Test write via REST API
   try {
-    const conn = process.env.EDGE_CONFIG;
-    const token = process.env.EDGE_CONFIG_TOKEN;
-    const idMatch = conn?.match(/ecfg_[a-z0-9]+/i);
-    const id = idMatch?.[0] || process.env.EDGE_CONFIG_ID;
-
-    if (id && token) {
-      const teamId = process.env.VERCEL_TEAM_ID;
-      const url = `https://api.vercel.com/v1/edge-config/${id}/items${teamId ? `?teamId=${teamId}` : ""}`;
-      const res = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          items: [{ op: "update", key: "test", value: "working" }],
-        }),
-      });
-      debugInfo.edgeConfigWrite = res.ok ? "success" : `failed (HTTP ${res.status})`;
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        debugInfo.writeResponse = text;
-      }
+    if (!edgeConfigUrl) {
+      debugInfo.edgeConfigWrite = "skipped (EDGE_CONFIG not set)";
     } else {
-      debugInfo.edgeConfigWrite = "skipped (missing id or token)";
+      const parsedUrl = new URL(edgeConfigUrl);
+      const edgeConfigId = parsedUrl.pathname.split("/").pop();
+      const token = parsedUrl.searchParams.get("token");
+
+      if (!edgeConfigId || !token) {
+        debugInfo.edgeConfigWrite = "skipped (could not parse ID or token from EDGE_CONFIG URL)";
+      } else {
+        const teamId = parsedUrl.searchParams.get("teamId") || process.env.VERCEL_TEAM_ID || "";
+        const apiUrl = `https://api.vercel.com/v1/edge-config/${edgeConfigId}/items${teamId ? `?teamId=${teamId}` : ""}`;
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            items: [
+              {
+                operation: "upsert",
+                key: "test",
+                value: "working",
+              },
+            ],
+          }),
+        });
+        debugInfo.edgeConfigWrite = res.ok ? "success" : `failed (HTTP ${res.status})`;
+        if (!res.ok) {
+          debugInfo.writeResponse = await res.text().catch(() => "");
+        }
+      }
     }
   } catch (error) {
     debugInfo.edgeConfigWrite = "failed";

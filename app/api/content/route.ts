@@ -1,38 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { get } from "@vercel/edge-config";
-import type { PortfolioData, SectionKey } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 const ADMIN_PASSWORD =
   process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
 
-const VALID_SECTIONS: SectionKey[] = [
-  "personalInfo",
-  "hero",
-  "about",
-  "experience",
-  "projects",
-  "contact",
-  "socials",
-];
-
-async function readSeed(): Promise<PortfolioData> {
-  try {
-    const { default: seed } = await import("@/data/seed.json");
-    return seed as PortfolioData;
-  } catch {
-    return {} as PortfolioData;
-  }
-}
+const SECTIONS = ["personalInfo", "hero", "about", "experience", "projects", "contact", "socials"];
 
 export async function GET() {
   try {
     if (process.env.EDGE_CONFIG) {
-      const sections = VALID_SECTIONS;
       const allData: Record<string, unknown> = {};
       let allPresent = true;
-      for (const s of sections) {
+      for (const s of SECTIONS) {
         try {
           const val = await get(s);
           if (val == null) { allPresent = false; break; }
@@ -43,67 +24,64 @@ export async function GET() {
         }
       }
       if (allPresent) {
-        return NextResponse.json(allData as unknown as PortfolioData);
+        return NextResponse.json(allData);
       }
     }
     const { default: seed } = await import("@/data/seed.json");
-    return NextResponse.json(seed as PortfolioData);
+    return NextResponse.json(seed);
   } catch (err) {
     console.error("[content] GET failed:", err);
-    return NextResponse.json({} as PortfolioData, { status: 200 });
+    return NextResponse.json({}, { status: 200 });
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
-    const { password, data } = body as {
+    const body = await request.json();
+    const { password, section, data } = body as {
       password?: string;
-      data?: Partial<PortfolioData>;
+      section?: string;
+      data?: unknown;
     };
 
     if (password !== ADMIN_PASSWORD) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!data || typeof data !== "object") {
-      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    if (!section || data === undefined) {
+      return NextResponse.json({ error: "Missing section or data" }, { status: 400 });
     }
 
-    const conn = process.env.EDGE_CONFIG;
-    const token = process.env.EDGE_CONFIG_TOKEN;
-    const idMatch = conn?.match(/ecfg_[a-z0-9]+/i);
-    const id = idMatch?.[0] || process.env.EDGE_CONFIG_ID;
-
-    if (!id || !token) {
-      return NextResponse.json(
-        { error: "Edge Config not configured — set EDGE_CONFIG, EDGE_CONFIG_TOKEN, and EDGE_CONFIG_ID env vars" },
-        { status: 500 }
-      );
+    const edgeConfigUrl = process.env.EDGE_CONFIG;
+    if (!edgeConfigUrl) {
+      return NextResponse.json({ error: "EDGE_CONFIG not set" }, { status: 500 });
     }
 
-    const items = VALID_SECTIONS.filter((key) => key in data).map((key) => ({
-      op: "update" as const,
-      key,
-      value: data[key],
-    }));
+    const parsedUrl = new URL(edgeConfigUrl);
+    const edgeConfigId = parsedUrl.pathname.split("/").pop();
+    const token = parsedUrl.searchParams.get("token");
 
-    if (items.length === 0) {
-      return NextResponse.json(
-        { error: "No valid sections provided" },
-        { status: 400 }
-      );
+    if (!edgeConfigId || !token) {
+      return NextResponse.json({ error: "Invalid EDGE_CONFIG format" }, { status: 500 });
     }
 
-    const teamId = process.env.VERCEL_TEAM_ID;
-    const url = `https://api.vercel.com/v1/edge-config/${id}/items${teamId ? `?teamId=${teamId}` : ""}`;
-    const res = await fetch(url, {
-      method: "PATCH",
+    const teamId = parsedUrl.searchParams.get("teamId") || process.env.VERCEL_TEAM_ID || "";
+    const apiUrl = `https://api.vercel.com/v1/edge-config/${edgeConfigId}/items${teamId ? `?teamId=${teamId}` : ""}`;
+    const res = await fetch(apiUrl, {
+      method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ items }),
+      body: JSON.stringify({
+        items: [
+          {
+            operation: "upsert",
+            key: section,
+            value: data,
+          },
+        ],
+      }),
     });
 
     if (!res.ok) {
@@ -111,8 +89,7 @@ export async function POST(req: NextRequest) {
       console.error("[content] Edge Config write failed:", res.status, errorText);
       return NextResponse.json(
         {
-          error: "Failed to publish to Edge Config",
-          status: res.status,
+          error: "Failed to write to Edge Config",
           details: errorText,
         },
         { status: 500 }
@@ -121,16 +98,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      updated: items.length,
       edge: true,
-      github: false,
-      message: "Published to Edge Config",
+      message: `Successfully published ${section} to Edge Config`,
     });
   } catch (err) {
     console.error("[content] POST failed:", err);
     return NextResponse.json(
       {
-        error: "Failed to publish to Edge Config",
+        error: "Failed to publish",
         details: err instanceof Error ? err.message : "Unknown error",
       },
       { status: 500 }
