@@ -6,16 +6,12 @@
     "email": "pooja.writer10@gmail.com",
     "locationAU": "Melbourne",
     "locationNP": "Jhapa",
-    "bio": "AI Solutions Architect & Full-Stack Developer crafting intelligent, scalable products at the intersection of machine learning and modern web engineering.",
-    "avatar": {
-      "original": "/uploads/profile.jpg",
-      "thumb": "/uploads/profile-thumb.jpg"
-    }
+    "bio": "AI Solutions Architect & Full-Stack Developer crafting intelligent, scalable products at the intersection of machine learning and modern web engineering."
   },
   "hero": {
     "title": "Building Intelligent Solutions",
     "subtitle": "Full-Stack Developer & AI Architect",
-    "ctaText": "View My Work"
+    "ctaText": "Here is my work"
   },
   "about": {
     "heading": "About Me",
@@ -48,32 +44,19 @@
   "projects": [
     {
       "id": 1,
-      "title": "NeuralOps Dashboard",
-      "description": "Real-time ML observability dashboard with model drift detection and alerting.",
-      "tech": [
-        "Next.js",
-        "Python",
-        "TensorFlow"
-      ],
-      "link": "https://",
-      "image": {
-        "original": "/uploads/projects/project1.jpg",
-        "thumb": "/uploads/projects/project1-thumb.jpg"
-      }
+      "title": "The project is coming soon!",
+      "description": "",
+      "tech": [],
+      "link": ""
     },
     {
       "id": 2,
-      "title": "Sentinel Chat",
-      "description": "Conversational AI assistant with RAG pipeline and streaming responses.",
-      "tech": [
-        "React",
-        "Node.js",
-        "OpenAI"
-      ],
-      "link": "https://",
+      "title": "coming soon!",
+      "description": "",
+      "tech": [],
+      "link": "",
       "image": {
-        "original": "/uploads/projects/project2.jpg",
-        "thumb": "/uploads/projects/project2-thumb.jpg"
+        "original": ""
       }
     }
   ],
