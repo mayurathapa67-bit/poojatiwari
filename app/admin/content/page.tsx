@@ -85,7 +85,7 @@ export default function AdminContentPage() {
 
     try {
       if (mode === "publish") {
-        console.log("[admin] Publishing data:", JSON.stringify(data, null, 2));
+        console.log('Form Data before publish:', JSON.stringify(data, null, 2));
         const res = await fetch("/api/content", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

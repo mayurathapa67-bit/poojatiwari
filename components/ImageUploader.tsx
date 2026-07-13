@@ -44,32 +44,45 @@ export default function ImageUploader({
       return;
     }
 
+    handleUpload(file);
+  }
+
+  async function handleUpload(file: File) {
     const localUrl = URL.createObjectURL(file);
     setPreview(localUrl);
     setStatus("uploading");
+    setError("");
     setProgress(15);
-
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("kind", kind);
-    fd.append("password", "admin2024");
 
     const timer = setInterval(() => setProgress((p) => Math.min(p + 20, 90)), 150);
 
-    fetch("/api/upload", { method: "POST", body: fd })
-      .then(async (res) => {
-        clearInterval(timer);
-        setProgress(100);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Upload failed");
-        onUploaded(data.image as ImageSet);
-        setStatus("done");
-      })
-      .catch((e: unknown) => {
-        clearInterval(timer);
-        setError(e instanceof Error ? e.message : "Upload failed");
-        setStatus("error");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
       });
+
+      clearInterval(timer);
+      setProgress(100);
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Upload failed");
+      }
+
+      if (result.success) {
+        onUploaded({ original: result.url, thumb: result.thumb } as ImageSet);
+        setStatus("done");
+      }
+    } catch (err) {
+      clearInterval(timer);
+      setError(err instanceof Error ? err.message : "Upload failed");
+      setStatus("error");
+    }
   }
 
   const shown = preview || value?.thumb || value?.medium || value?.original || null;
@@ -137,10 +150,8 @@ export default function ImageUploader({
       />
 
       {status === "done" && value && (
-        <p className="mt-2 font-mono text-xs text-muted">
+        <p className="mt-2 truncate font-mono text-xs text-muted">
           Saved: <span className="text-primary">{value.original}</span>
-          <br />
-          <span className="text-muted/70">Commit /public/uploads to deploy to production.</span>
         </p>
       )}
       {status === "error" && error && (
