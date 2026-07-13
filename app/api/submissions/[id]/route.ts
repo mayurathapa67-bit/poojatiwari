@@ -3,7 +3,8 @@ import { deleteSubmission, archiveSubmission } from "@/lib/submissions";
 
 export const dynamic = "force-dynamic";
 
-const ADMIN_PASSWORD = "admin2024";
+const ADMIN_PASSWORD =
+  process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
 
 export async function PUT(
   req: NextRequest,
@@ -13,10 +14,11 @@ export async function PUT(
   if (password !== ADMIN_PASSWORD) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
   try {
     const body = await req.json();
     const archived = body.archived !== false;
-    const ok = archiveSubmission(params.id, archived);
+    const ok = await archiveSubmission(params.id, archived);
     if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ success: true });
   } catch {
@@ -33,9 +35,11 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const ok = deleteSubmission(params.id);
-  if (!ok) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  try {
+    const ok = await deleteSubmission(params.id);
+    if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Failed" }, { status: 500 });
   }
-  return NextResponse.json({ success: true });
 }

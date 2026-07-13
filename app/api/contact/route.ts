@@ -67,11 +67,13 @@ export async function POST(req: NextRequest) {
     }
 
     const newSubmission = {
-      id: Date.now(),
+      id: Date.now().toString(36) + Math.random().toString(36).substring(2, 8),
       name,
       email,
+      subject: String(body.subject ?? "").trim(),
       message,
-      date: new Date().toISOString(),
+      timestamp: new Date().toISOString(),
+      archived: false,
     };
 
     const updatedSubmissions = [...currentSubmissions, newSubmission];

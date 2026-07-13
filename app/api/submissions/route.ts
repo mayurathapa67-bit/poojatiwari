@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readSubmissions } from "@/lib/submissions";
+import type { Submission } from "@/lib/submission-types";
 
 export const dynamic = "force-dynamic";
 
@@ -13,14 +14,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // readSubmissions() falls back to an empty array when the file is
-    // missing or unreadable, so this never 500s on a read-only FS.
-    const submissions = readSubmissions().sort((a, b) =>
-      b.timestamp.localeCompare(a.timestamp)
-    );
-    return NextResponse.json(submissions);
+    const submissions: Submission[] = await readSubmissions();
+    submissions.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+    return NextResponse.json(submissions, {
+      headers: { "Cache-Control": "no-store, must-revalidate" },
+    });
   } catch (err) {
     console.error("[submissions] GET failed:", err);
-    return NextResponse.json([], { status: 200 });
+    return NextResponse.json([]);
   }
 }
