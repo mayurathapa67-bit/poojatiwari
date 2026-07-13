@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const dynamic = "force-dynamic";
 
@@ -27,32 +24,85 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await resend.emails.send({
-      from: "Portfolio Contact <onboarding@resend.dev>",
-      to: ["pooja.writer10@gmail.com"],
-      subject: `New Contact Form Submission from ${name}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #f9f9f9; border-radius: 8px;">
-          <h2 style="color: #333; margin-bottom: 16px;">New Contact Form Submission</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-              <td style="padding: 12px 16px; background: #fff; border: 1px solid #e0e0e0; font-weight: bold; color: #555; width: 80px;">Name</td>
-              <td style="padding: 12px 16px; background: #fff; border: 1px solid #e0e0e0; color: #333;">${name}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px 16px; background: #fff; border: 1px solid #e0e0e0; font-weight: bold; color: #555;">Email</td>
-              <td style="padding: 12px 16px; background: #fff; border: 1px solid #e0e0e0; color: #333;">${email}</td>
-            </tr>
-            <tr>
-              <td style="padding: 12px 16px; background: #fff; border: 1px solid #e0e0e0; font-weight: bold; color: #555; vertical-align: top;">Message</td>
-              <td style="padding: 12px 16px; background: #fff; border: 1px solid #e0e0e0; color: #333; white-space: pre-wrap;">${message}</td>
-            </tr>
-          </table>
-        </div>
-      `,
-    });
+    const githubToken = process.env.GITHUB_TOKEN;
+    const githubRepo = process.env.GITHUB_REPO;
+    const githubBranch = process.env.GITHUB_BRANCH || "main";
 
-    return NextResponse.json({ success: true });
+    if (!githubToken || !githubRepo) {
+      return NextResponse.json(
+        { error: "Server not configured for submissions." },
+        { status: 500 }
+      );
+    }
+
+    const filePath = "data/submissions.json";
+    const apiUrl = `https://api.github.com/repos/${githubRepo}/contents/${filePath}?ref=${githubBranch}`;
+
+    const headers: Record<string, string> = {
+      Authorization: `token ${githubToken}`,
+      Accept: "application/vnd.github.v3+json",
+    };
+
+    const getResponse = await fetch(apiUrl, { headers });
+
+    let currentSubmissions: unknown[] = [];
+    let sha: string | undefined;
+
+    if (getResponse.ok) {
+      const currentFile = await getResponse.json();
+      sha = currentFile.sha;
+      const content = Buffer.from(currentFile.content, "base64").toString("utf-8");
+      try {
+        currentSubmissions = JSON.parse(content);
+        if (!Array.isArray(currentSubmissions)) currentSubmissions = [];
+      } catch {
+        currentSubmissions = [];
+      }
+    } else if (getResponse.status !== 404) {
+      const errorText = await getResponse.text();
+      return NextResponse.json(
+        { error: "Failed to read submissions file.", details: errorText },
+        { status: 500 }
+      );
+    }
+
+    const newSubmission = {
+      id: Date.now(),
+      name,
+      email,
+      message,
+      date: new Date().toISOString(),
+    };
+
+    const updatedSubmissions = [...currentSubmissions, newSubmission];
+    const newContent = JSON.stringify(updatedSubmissions, null, 2);
+    const newContentBase64 = Buffer.from(newContent).toString("base64");
+
+    const putBody: Record<string, unknown> = {
+      message: `Add contact submission from ${name}`,
+      content: newContentBase64,
+      branch: githubBranch,
+    };
+    if (sha) putBody.sha = sha;
+
+    const putResponse = await fetch(
+      `https://api.github.com/repos/${githubRepo}/contents/${filePath}`,
+      {
+        method: "PUT",
+        headers: { ...headers, "Content-Type": "application/json" },
+        body: JSON.stringify(putBody),
+      }
+    );
+
+    if (!putResponse.ok) {
+      const errorText = await putResponse.text();
+      return NextResponse.json(
+        { error: "Failed to save submission.", details: errorText },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, message: "Message saved!" });
   } catch {
     return NextResponse.json(
       { error: "Failed to submit. Please try again." },
