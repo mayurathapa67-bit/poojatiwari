@@ -79,7 +79,7 @@ export async function POST(
     if (publishMode === "local") {
       const isVercel = process.env.VERCEL === "1" || process.env.VERCEL_ENV != null;
       if (!isVercel) {
-        await writeDB(db, "local");
+        await writeDB(db);
       }
       return NextResponse.json({ success: true, state: "local", github: false });
     }
