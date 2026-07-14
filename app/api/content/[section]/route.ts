@@ -9,11 +9,15 @@ const ADMIN_PASSWORD =
   process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2024";
 
 const VALID_SECTIONS: SectionKey[] = [
-  "personalInfo",
+  "personal",
+  "nav",
   "hero",
   "about",
+  "services",
+  "portfolio",
+  "blog",
   "experience",
-  "projects",
+  "testimonials",
   "contact",
   "socials",
 ];
@@ -83,12 +87,17 @@ export async function POST(
     const result = await writeDB(db, "all");
 
     const routes: Record<string, string> = {
-      personalInfo: "/",
+      personal: "/",
+      nav: "/",
       hero: "/",
       about: "/about",
+      services: "/services",
+      portfolio: "/portfolio",
+      blog: "/blog",
       experience: "/experience",
-      projects: "/projects",
+      testimonials: "/",
       contact: "/contact",
+      socials: "/",
     };
     if (routes[section]) revalidatePath(routes[section]);
 

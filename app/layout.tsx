@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import { MotionConfig } from "framer-motion";
 import "./globals.css";
 
@@ -9,32 +9,43 @@ const inter = Inter({
   display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-instrument",
+  variable: "--font-playfair",
   display: "swap",
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pooja-tiwari.vercel.app"),
   title: {
-    default: "Pooja Tiwari | AI Solutions Architect & Full-Stack Developer",
+    default: "Pooja Tiwari | Content Writer & Copywriter",
     template: "%s | Pooja Tiwari",
   },
   description:
-    "Portfolio of Pooja Tiwari — AI Solutions Architect & Full-Stack Developer building intelligent, scalable solutions.",
+    "Pooja Tiwari — Content Writer & Copywriter crafting words that convert and stories that stick. SEO writing, brand copy, and content strategy.",
+  keywords: [
+    "Content Writer",
+    "Copywriter",
+    "SEO Writing",
+    "Brand Copy",
+    "Content Strategy",
+    "Nepal",
+    "Australia",
+  ],
+  authors: [{ name: "Pooja Tiwari" }],
   openGraph: {
-    title: "Pooja Tiwari | AI Solutions Architect & Full-Stack Developer",
+    title: "Pooja Tiwari | Content Writer & Copywriter",
     description:
-      "AI Solutions Architect & Full-Stack Developer crafting intelligent, scalable products.",
+      "Words that convert, stories that stick. Editorial content, SEO copy and brand storytelling by Pooja Tiwari.",
     type: "website",
+    locale: "en_US",
+    siteName: "Pooja Tiwari",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pooja Tiwari",
-    description: "AI Solutions Architect & Full-Stack Developer.",
+    title: "Pooja Tiwari | Content Writer & Copywriter",
+    description: "Words that convert, stories that stick.",
   },
 };
 
@@ -44,13 +55,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`} suppressHydrationWarning={true}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${playfair.variable}`}
+      suppressHydrationWarning={true}
+    >
       <body className="bg-background text-ink antialiased" suppressHydrationWarning={true}>
-        <div className="mesh-bg" aria-hidden="true">
-          <div className="mesh-blob b1" />
-          <div className="mesh-blob b2" />
-          <div className="mesh-blob b3" />
-        </div>
         <MotionConfig reducedMotion="user">{children}</MotionConfig>
       </body>
     </html>

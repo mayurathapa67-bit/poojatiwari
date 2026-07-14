@@ -2,7 +2,10 @@
 
 import useSWR from "swr";
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+const fetcher = (url: string) =>
+  fetch(url, { cache: "no-store", next: { revalidate: 0 } } as RequestInit).then((r) =>
+    r.json()
+  );
 
 export function useJson<T>(url: string) {
   const { data, error, isLoading, mutate } = useSWR<T>(url, fetcher, {

@@ -66,7 +66,7 @@ export default function SubmissionsPage() {
 
   useEffect(() => {
     if (!authed) return;
-    const id = setInterval(load, 15000);
+    const id = setInterval(load, 8000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authed]);
@@ -151,15 +151,26 @@ export default function SubmissionsPage() {
   const visibleCount = subs.filter((s) => !s.archived).length;
 
   return (
-    <div className="min-h-screen lg:pl-64">
+    <div className="relative min-h-screen bg-obsidian-900 lg:pl-64">
+      <div aria-hidden className="pointer-events-none absolute -left-40 top-0 h-[28rem] w-[28rem] rounded-full bg-mesh-2 blur-[120px]" />
       <AdminSidebar active="submissions" onLogout={logout} />
       <MobileAdminBar active="submissions" onLogout={logout} />
 
-      <main className="container-px py-8 lg:py-10">
+      <main className="relative z-10 container-px py-8 lg:py-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="flex items-center gap-2 text-2xl font-bold text-pearl">
-              <Inbox size={22} className="text-primary" /> Submissions
+            <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+              <Inbox size={14} /> Inbox
+            </p>
+            <h1 className="flex flex-wrap items-center gap-2 font-serif text-3xl font-bold text-pearl">
+              Submissions
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-teal/40 bg-teal/10 px-2.5 py-0.5 text-xs font-medium text-teal">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-teal opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-teal" />
+                </span>
+                Live
+              </span>
             </h1>
             <p className="mt-1 text-sm text-muted">
               <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 font-mono text-xs text-muted">
@@ -217,7 +228,7 @@ export default function SubmissionsPage() {
           </button>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] shadow-card backdrop-blur-xl">
+        <div className="overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.03] shadow-card backdrop-blur-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>

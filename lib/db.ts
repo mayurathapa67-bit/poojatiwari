@@ -8,11 +8,15 @@ const SEED_PATH = path.join(DATA_DIR, "seed.json");
 const DRAFTS_PATH = path.join(DATA_DIR, "drafts.json");
 
 export const SECTION_KEYS: SectionKey[] = [
-  "personalInfo",
+  "personal",
+  "nav",
   "hero",
   "about",
+  "services",
+  "portfolio",
+  "blog",
   "experience",
-  "projects",
+  "testimonials",
   "contact",
   "socials",
 ];

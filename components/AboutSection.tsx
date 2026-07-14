@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User } from "lucide-react";
+import Image from "next/image";
+import { Quote, Award } from "lucide-react";
 import type { About, PersonalInfo } from "@/lib/types";
+import { imageSrc } from "@/lib/utils";
 import SectionHeading from "./SectionHeading";
 
 export default function AboutSection({
@@ -12,29 +14,40 @@ export default function AboutSection({
   about: About;
   personal: PersonalInfo;
 }) {
-  return (
-    <section id="about" className="section-pad bg-background">
-      <div className="container-px">
-        <SectionHeading eyebrow="About" title={about.heading} />
+  const image = imageSrc(about.image) || imageSrc(personal.avatar);
 
-        <div className="grid gap-10 lg:grid-cols-5">
+  return (
+    <section id="about" className="section-pad bg-cream">
+      <div className="container-px">
+        <SectionHeading
+          eyebrow="About"
+          title={
+            <>
+              Writing is the shortest distance between a brand and a{" "}
+              <span className="serif-accent">believer</span>.
+            </>
+          }
+        />
+
+        <div className="grid gap-12 lg:grid-cols-12">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="lg:col-span-3"
+            className="lg:col-span-5"
           >
-            <p className="text-lg leading-relaxed text-muted">
-              {about.description}
-            </p>
-            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted">
-              <span className="flex items-center gap-2">
-                <User size={16} className="text-primary" />
-                {personal.email}
-              </span>
-              <span>{personal.phone}</span>
-            </div>
+            {image && (
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-line shadow-soft-lg">
+                <Image
+                  src={image}
+                  alt={personal.name}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 440px"
+                  className="object-cover"
+                />
+              </div>
+            )}
           </motion.div>
 
           <motion.div
@@ -42,29 +55,47 @@ export default function AboutSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="lg:col-span-2"
+            className="lg:col-span-7"
           >
+            <p className="text-lg leading-relaxed text-ink/90">{about.bio}</p>
+
+            <div className="my-8 flex gap-4 rounded-2xl border border-line bg-white/60 p-6 shadow-card">
+              <Quote size={28} className="shrink-0 text-burgundy" />
+              <p className="pull-quote text-lg leading-relaxed">{about.philosophy}</p>
+            </div>
+
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">
-              Skills
+              Areas of Expertise
             </h3>
-            <ul className="space-y-3">
-              {about.skills.map((skill) => (
-                <li key={skill}>
-                  <div className="mb-1 flex items-center justify-between text-sm">
-                    <span className="font-medium text-ink">{skill}</span>
-                  </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-line">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: "88%" }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8 }}
-                      className="h-full rounded-full bg-primary"
-                    />
-                  </div>
-                </li>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {about.expertise.map((area) => (
+                <div
+                  key={area.id}
+                  className="rounded-2xl border border-line bg-white/60 p-5 shadow-sm transition-all hover:border-line-strong hover:shadow-card"
+                >
+                  <p className="font-serif text-lg font-semibold text-ink">{area.title}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted">{area.description}</p>
+                </div>
               ))}
-            </ul>
+            </div>
+
+            {about.certifications.length > 0 && (
+              <div className="mt-8">
+                <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted">
+                  <Award size={16} className="text-primary" /> Certifications
+                </h3>
+                <div className="flex flex-wrap gap-2.5">
+                  {about.certifications.map((cert) => (
+                    <span
+                      key={cert}
+                      className="rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-xs font-medium text-ink"
+                    >
+                      {cert}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>

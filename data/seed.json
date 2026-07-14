@@ -1,75 +1,102 @@
 {
-  "personalInfo": {
+  "personal": {
     "name": "Pooja Tiwari",
-    "profession": "AI Solutions Architect & Full-Stack Developer",
-    "phone": "+61 482 082 975",
-    "email": "pooja.writer10@gmail.com",
-    "locationAU": "Melbourne",
-    "locationNP": "Jhapa",
-    "bio": "AI Solutions Architect & Full-Stack Developer crafting intelligent, scalable products at the intersection of machine learning and modern web engineering."
+    "profession": "Content Writer & Copywriter",
+    "email": "hello@poojatiwari.com",
+    "phone": "+977 9800000000",
+    "location": "Kathmandu, Nepal / Melbourne, Australia",
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=80"
   },
-  "hero": {
-    "title": "Building Intelligent Solutions",
-    "subtitle": "Full-Stack Developer & AI Architect",
-    "ctaText": "Here is my work"
-  },
-  "about": {
-    "heading": "About Me",
-    "description": "I'm Pooja Tiwari, an AI Solutions Architect and Full-Stack Developer based between Melbourne and Jhapa. I design and ship end-to-end intelligent systems — from data pipelines and model serving to polished, responsive frontends. I care about clean architecture, measurable impact, and delightful user experiences.",
-    "skills": [
-      "React",
-      "Next.js",
-      "TypeScript",
-      "Python",
-      "AI/ML",
-      "Node.js"
+  "nav": {
+    "logo": "Pooja Tiwari",
+    "links": [
+      { "label": "Home", "href": "/" },
+      { "label": "About", "href": "/about" },
+      { "label": "Writing", "href": "/portfolio" },
+      { "label": "Services", "href": "/services" },
+      { "label": "Journal", "href": "/blog" },
+      { "label": "Contact", "href": "/contact" }
     ]
   },
-  "experience": [
-    {
-      "id": 1,
-      "company": "Nexus AI Labs",
-      "position": "AI Solutions Architect",
-      "duration": "2022 - Present",
-      "description": "Lead the design of production ML systems and full-stack platforms serving thousands of users."
-    },
-    {
-      "id": 2,
-      "company": "Brightwave Technologies",
-      "position": "Senior Full-Stack Developer",
-      "duration": "2020 - 2022",
-      "description": "Built scalable web applications and internal tooling using React, Next.js and Python."
-    }
+  "hero": {
+    "title": "Pooja Tiwari",
+    "role": "Content Writer & Copywriter",
+    "tagline": "Words that convert, stories that stick. I craft editorial content, SEO copy and brand narratives that move readers to act.",
+    "cta_primary": { "label": "View My Work", "href": "/portfolio" },
+    "cta_secondary": { "label": "Let's Talk", "href": "/contact" },
+    "image": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=80"
+  },
+  "about": {
+    "headline": "Writing is the shortest distance between a brand and a believer.",
+    "bio": "I'm Pooja Tiwari, a content writer and copywriter based between Nepal and Australia. For the past six years I've helped startups, agencies and established brands find their voice — translating complex ideas into clear, compelling stories that readers actually finish. From search-optimised articles to conversion-focused landing pages, my work is grounded in research, sharpened by craft, and measured by results.",
+    "philosophy": "Good writing isn't decoration — it's architecture. Every sentence should earn its place by informing, persuading, or delighting. I write for the reader first and the algorithm second, because trust is what truly converts.",
+    "expertise": [
+      { "id": 1, "title": "Blog & Article Writing", "description": "Long-form, research-led articles that build authority and keep readers on the page." },
+      { "id": 2, "title": "SEO Copywriting", "description": "Keyword-aware copy that ranks without ever sounding robotic." },
+      { "id": 3, "title": "Brand & Website Copy", "description": "Homepages, about pages and product copy with a distinct, human voice." },
+      { "id": 4, "title": "Content Strategy", "description": "Editorial calendars, tone-of-voice guides and funnels that scale." }
+    ],
+    "experience": [
+      { "id": 1, "company": "Lumen Content Studio", "position": "Senior Content Writer", "duration": "2022 — Present", "description": "Lead long-form content and SEO strategy for SaaS and fintech clients across ANZ and APAC." },
+      { "id": 2, "company": "Meraki Digital", "position": "Copywriter", "duration": "2020 — 2022", "description": "Wrote conversion-focused website and ad copy for 40+ brand launches." },
+      { "id": 3, "company": "The Kathmandu Post", "position": "Contributing Features Writer", "duration": "2018 — 2020", "description": "Published culture and technology features read by a national audience." }
+    ],
+    "certifications": [
+      "HubSpot Content Marketing Certification",
+      "Google UX Writing Fundamentals",
+      "Yoast SEO for Beginners"
+    ],
+    "image": "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=1000&q=80"
+  },
+  "services": [
+    { "id": 1, "title": "Content Strategy", "description": "Editorial calendars, audience research and tone-of-voice systems that turn scattered ideas into a coherent publishing engine.", "icon": "Compass", "price": "from $450/project", "features": ["Content audit & roadmap", "SEO keyword mapping", "Editorial calendar", "Tone-of-voice guide"] },
+    { "id": 2, "title": "SEO Writing", "description": "Research-led articles and landing pages engineered to rank — and to read like a human wrote them (because one did).", "icon": "Search", "price": "from $0.12/word", "features": ["Keyword research", "Competitor analysis", "On-page optimisation", "Internal linking"] },
+    { "id": 3, "title": "Brand Copywriting", "description": "Website, product and brand copy that sounds like you — only sharper, warmer and impossible to ignore.", "icon": "PenLine", "price": "from $300/page", "features": ["Home & about pages", "Product descriptions", "Taglines & microcopy", "Landing pages"] },
+    { "id": 4, "title": "Social Media Content", "description": "Scroll-stopping captions, threads and carousels that grow communities and start conversations.", "icon": "Megaphone", "price": "from $250/mo", "features": ["Caption packs", "Content pillars", "Hashtag strategy", "Monthly calendar"] },
+    { "id": 5, "title": "Email Marketing", "description": "Welcome sequences and newsletters that nurture subscribers into loyal customers.", "icon": "Mail", "price": "from $120/email", "features": ["Welcome sequences", "Newsletters", "Subject-line testing", "Segmentation"] }
   ],
-  "projects": [
-    {
-      "id": 1,
-      "title": "The project is coming soon!",
-      "description": "",
-      "tech": [],
-      "link": ""
-    },
-    {
-      "id": 2,
-      "title": "coming soon!",
-      "description": "",
-      "tech": [],
-      "link": "",
-      "image": {
-        "original": ""
-      }
-    }
+  "portfolio": [
+    { "id": 1, "title": "The Quiet Power of a Well-Written Onboarding Email", "category": "Blog Posts", "excerpt": "Why the first message a user receives sets the tone for their entire relationship with your product.", "content": "Onboarding is the most underrated page in your funnel. This long-form piece explores the psychology of first contact, breaking down three real-world sequences and the small copy changes that lifted activation by double digits. We look at subject lines, the art of the single CTA, and why clarity always beats cleverness in the inbox.", "client": "Lumen Content Studio", "published_date": "2025-11-02", "read_time": 6, "featured_image": "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=1000&q=80", "featured": true },
+    { "id": 2, "title": "10 Local SEO Wins for Small Businesses in 2025", "category": "SEO Content", "excerpt": "A practical, no-fluff checklist for capturing 'near me' searches without a big agency budget.", "content": "Local search keeps changing, but the fundamentals are stubbornly consistent. This guide walks through Google Business Profile optimisation, review velocity, schema markup and the content gaps most local sites leave wide open. Each tactic includes a copy template you can deploy this week.", "client": "Meraki Digital", "published_date": "2025-09-18", "read_time": 9, "featured_image": "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?auto=format&fit=crop&w=1000&q=80", "featured": true },
+    { "id": 3, "title": "Homepage Rewrite: From Features to Feelings", "category": "Website Copy", "excerpt": "How a fintech startup tripled demo requests by rewriting three sections of its homepage.", "content": "A breakdown of a real homepage overhaul: the before-and-after of a hero, a benefits-led feature grid, and a pricing page that finally made sense. We dissect the messaging hierarchy and the microcopy that removed friction at every step.", "client": "Northwind Fintech", "published_date": "2025-08-05", "read_time": 7, "featured_image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80" },
+    { "id": 4, "title": "API Documentation That Developers Actually Read", "category": "Technical Writing", "excerpt": "A field guide to writing developer docs that reduce support tickets and build trust.", "content": "Technical writing is its own discipline. This piece covers information architecture for docs, the anatomy of a great quickstart, and how to write code samples that don't rot. Built from a year of maintaining documentation for an open-source SDK.", "client": "OpenStack Labs", "published_date": "2025-06-21", "read_time": 11, "featured_image": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1000&q=80" },
+    { "id": 5, "title": "A Letter to the Brand That Forgot Its Voice", "category": "Creative Writing", "excerpt": "A short, lyrical piece on why consistency of voice is the quietest form of brand trust.", "content": "Sometimes the best way to make a point is to feel it. This creative essay personifies a brand losing its voice and finding it again — a favourite piece used in tone-of-voice workshops to show (not tell) teams what's at stake.", "published_date": "2025-05-09", "read_time": 4, "featured_image": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1000&q=80" },
+    { "id": 6, "title": "The Ultimate Guide to B2B Thought Leadership", "category": "Blog Posts", "excerpt": "Stop publishing me-too listicles. Here's how to build genuine authority in a crowded niche.", "content": "Thought leadership isn't a content format — it's a point of view. This comprehensive guide covers finding your angle, structuring long-form pieces, and the distribution habits that separate forgotten posts from industry references.", "client": "Lumen Content Studio", "published_date": "2025-03-14", "read_time": 12, "featured_image": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1000&q=80" },
+    { "id": 7, "title": "Product Description Refresh for a Skincare Line", "category": "Website Copy", "excerpt": "Sensory, compliant copy that turned browsers into buyers for a clean-beauty brand.", "content": "A portfolio sample showing before/after product descriptions across a 24-SKU range, balancing evocative language with claim compliance. Includes the brief, the guardrails, and the results.", "client": "Botanica Co.", "published_date": "2025-02-02", "read_time": 5, "featured_image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1000&q=80" },
+    { "id": 8, "title": "Email Sequence: The 5-Touch Welcome", "category": "Blog Posts", "excerpt": "A annotated breakdown of a welcome sequence that nurtured 12k subscribers into customers.", "content": "We open the hood on a five-email welcome flow: the hook, the story, the proof, the offer and the nudge. Each email is annotated with the strategic intent behind every line.", "client": "Meraki Digital", "published_date": "2024-12-19", "read_time": 8, "featured_image": "https://images.unsplash.com/photo-1512314889357-e575a29a86d3?auto=format&fit=crop&w=1000&q=80" }
+  ],
+  "blog": [
+    { "id": 1, "title": "Why I Write the conclusion before the introduction", "excerpt": "A small habit that changed how I structure every piece of long-form content.", "content": "Knowing where you're going makes the path obvious. In this journal entry I share the counter-intuitive outlining technique that cut my drafting time in half and made my arguments tighter. We look at real examples from client work and the science of cognitive load.", "published_date": "2025-12-01", "read_time": 5, "category": "Craft", "featured_image": "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=1000&q=80" },
+    { "id": 2, "title": "The difference between good SEO and invisible SEO", "excerpt": "Ranking is the easy part. Keeping the reader is the craft.", "content": "Too many writers stop at the keyword. This piece argues that the real SEO skill is retention — writing the kind of content people finish, share and link to. I break down the on-page signals that actually matter in 2025.", "published_date": "2025-10-15", "read_time": 7, "category": "SEO", "featured_image": "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?auto=format&fit=crop&w=1000&q=80" },
+    { "id": 3, "title": "A copywriter's case against the exclamation point", "excerpt": "Punctuation is persuasion. Here's when to put the excitement down.", "content": "A short, opinionated take on restraint in copy. When everything shouts, nothing is heard — so I make the case for calm, confident writing and show three rewrites that landed harder without a single '!'.", "published_date": "2025-07-28", "read_time": 4, "category": "Opinion", "featured_image": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1000&q=80" }
+  ],
+  "experience": [
+    { "id": 1, "company": "Lumen Content Studio", "position": "Senior Content Writer", "duration": "2022 — Present", "description": "Lead long-form content and SEO strategy for SaaS and fintech clients across ANZ and APAC." },
+    { "id": 2, "company": "Meraki Digital", "position": "Copywriter", "duration": "2020 — 2022", "description": "Wrote conversion-focused website and ad copy for 40+ brand launches." },
+    { "id": 3, "company": "The Kathmandu Post", "position": "Contributing Features Writer", "duration": "2018 — 2020", "description": "Published culture and technology features read by a national audience." }
+  ],
+  "testimonials": [
+    { "id": 1, "quote": "Pooja rewrote our homepage and demo requests tripled within a month. She has a rare gift for finding the human truth inside a technical product.", "name": "Aarav Sharma", "role": "Founder", "company": "Northwind Fintech", "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" },
+    { "id": 2, "quote": "The most reliable writer we've worked with. Her SEO articles consistently out-rank competitors twice our size, and they actually read beautifully.", "name": "Elena Whitfield", "role": "Head of Growth", "company": "Lumen Content Studio", "avatar": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80" },
+    { "id": 3, "quote": "Pooja shaped our entire tone of voice. Our brand finally sounds like a person, not a committee. Every team member references her style guide.", "name": "Daniel Okafor", "role": "Marketing Lead", "company": "Botanica Co.", "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" },
+    { "id": 4, "quote": "Working across two time zones was seamless. She delivered sharp, research-led copy on every deadline without sacrificing warmth.", "name": "Mira Rai", "role": "Agency Director", "company": "Meraki Digital", "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80" }
   ],
   "contact": {
-    "heading": "Get In Touch",
-    "email": "pooja.writer10@gmail.com",
-    "phone": "+61 482 082 975",
-    "locationAU": "Melbourne",
-    "locationNP": "Jhapa"
+    "heading": "Let's write something worth reading.",
+    "email": "hello@poojatiwari.com",
+    "phone": "+977 9800000000",
+    "location": "Kathmandu, Nepal / Melbourne, Australia",
+    "socials": {
+      "github": "https://github.com/poojatiwari",
+      "linkedin": "https://linkedin.com/in/poojatiwari",
+      "twitter": "https://twitter.com/poojatiwari",
+      "instagram": "https://instagram.com/poojatiwari"
+    }
   },
   "socials": {
-    "github": "https://github.com/username",
-    "linkedin": "https://linkedin.com/in/username",
-    "twitter": "https://twitter.com/username"
+    "github": "https://github.com/poojatiwari",
+    "linkedin": "https://linkedin.com/in/poojatiwari",
+    "twitter": "https://twitter.com/poojatiwari",
+    "instagram": "https://instagram.com/poojatiwari"
   }
 }

@@ -3,30 +3,19 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, ArrowUpRight } from "lucide-react";
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import type { PersonalInfo } from "@/lib/types";
+import { motion, AnimatePresence } from "framer-motion";
+import type { PersonalInfo, NavLink } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import Magnetic from "./Magnetic";
 
-const NAV_ITEMS = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Experience", href: "/experience" },
-  { label: "Projects", href: "/projects" },
-  { label: "Contact", href: "/contact" },
-];
-
-export default function Navbar({ personal }: { personal: PersonalInfo }) {
+export default function Navbar({
+  personal,
+  links,
+}: {
+  personal: PersonalInfo;
+  links: NavLink[];
+}) {
   const [open, setOpen] = useState(false);
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const spotlight = useMotionTemplate`radial-gradient(120px circle at ${mx}px ${my}px, rgba(99,102,241,0.25), transparent 70%)`;
-
-  function onMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mx.set(e.clientX - rect.left);
-    my.set(e.clientY - rect.top);
-  }
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">
@@ -34,25 +23,19 @@ export default function Navbar({ personal }: { personal: PersonalInfo }) {
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        onMouseMove={onMove}
-        className="group pointer-events-auto relative flex w-full max-w-3xl items-center justify-between gap-4 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2.5 shadow-card backdrop-blur-xl"
+        className="pointer-events-auto relative flex w-full max-w-5xl items-center justify-between gap-4 rounded-full border border-line bg-white/70 px-4 py-2.5 shadow-card backdrop-blur-xl"
       >
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{ background: spotlight }}
-        />
         <Link href="/" className="relative z-10 flex items-center gap-2.5 pl-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-gradient text-sm font-bold text-white shadow-glow">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-gradient font-serif text-sm font-bold text-white">
             {personal.name.charAt(0)}
           </span>
           <span className="hidden text-sm font-semibold tracking-tight text-ink sm:block">
-            {personal.name.split(" ")[0]}
+            {personal.name}
           </span>
         </Link>
 
         <ul className="relative z-10 hidden items-center gap-1 md:flex">
-          {NAV_ITEMS.map((item) => (
+          {links.map((item) => (
             <li key={item.href}>
               <Magnetic strength={0.3}>
                 <Link
@@ -88,26 +71,31 @@ export default function Navbar({ personal }: { personal: PersonalInfo }) {
         </button>
       </motion.nav>
 
-      <div
-        className={cn(
-          "pointer-events-auto absolute top-[68px] w-[calc(100%-2rem)] max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl transition-all duration-300 md:hidden",
-          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="pointer-events-auto absolute top-[68px] w-[calc(100%-2rem)] max-w-5xl overflow-hidden rounded-2xl border border-line bg-white/90 shadow-soft-lg backdrop-blur-xl md:hidden"
+          >
+            <ul className="flex flex-col p-2">
+              {links.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="block rounded-xl px-4 py-3 text-sm font-medium text-ink transition-colors hover:bg-cream"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
         )}
-      >
-        <ul className="flex flex-col p-2">
-          {NAV_ITEMS.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="block rounded-xl px-4 py-3 text-sm font-medium text-muted transition-colors hover:bg-white/[0.06] hover:text-ink"
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+      </AnimatePresence>
     </header>
   );
 }

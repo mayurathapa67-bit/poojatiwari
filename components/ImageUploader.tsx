@@ -2,21 +2,19 @@
 
 import { useRef, useState } from "react";
 import { UploadCloud, CheckCircle2, AlertCircle, ImageIcon } from "lucide-react";
-import type { ImageSet } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface ImageUploaderProps {
   label: string;
-  kind: "profile" | "project";
-  value?: ImageSet;
-  onUploaded: (image: ImageSet) => void;
+  kind?: "profile" | "project";
+  value?: string;
+  onUploaded: (url: string) => void;
   maxSizeMB?: number;
   aspect?: "1:1" | "16:9";
 }
 
 export default function ImageUploader({
   label,
-  kind,
   value,
   onUploaded,
   maxSizeMB = 5,
@@ -29,7 +27,6 @@ export default function ImageUploader({
   const [error, setError] = useState("");
 
   const maxBytes = maxSizeMB * 1024 * 1024;
-  const aspectClass = aspect === "1:1" ? "aspect-square" : "aspect-video";
 
   function handleFile(file: File) {
     setError("");
@@ -43,7 +40,6 @@ export default function ImageUploader({
       setStatus("error");
       return;
     }
-
     handleUpload(file);
   }
 
@@ -75,7 +71,7 @@ export default function ImageUploader({
       }
 
       if (result.success) {
-        onUploaded({ original: result.url, thumb: result.thumb } as ImageSet);
+        onUploaded(result.url as string);
         setStatus("done");
       }
     } catch (err) {
@@ -85,7 +81,7 @@ export default function ImageUploader({
     }
   }
 
-  const shown = preview || value?.thumb || value?.medium || value?.original || null;
+  const shown = preview || value || null;
 
   return (
     <div>
@@ -94,7 +90,7 @@ export default function ImageUploader({
       <div
         className={cn(
           "group relative flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-4 text-center transition-colors",
-          status === "error" ? "border-danger/60 bg-dangerbg" : "border-line bg-background hover:border-primary/50",
+          status === "error" ? "border-danger/60 bg-dangerbg" : "border-line bg-white/60 hover:border-primary/50",
           aspect === "1:1" ? "aspect-square" : "aspect-video"
         )}
         onClick={() => inputRef.current?.click()}
@@ -151,7 +147,7 @@ export default function ImageUploader({
 
       {status === "done" && value && (
         <p className="mt-2 truncate font-mono text-xs text-muted">
-          Saved: <span className="text-primary">{value.original}</span>
+          Saved: <span className="text-primary">{value}</span>
         </p>
       )}
       {status === "error" && error && (

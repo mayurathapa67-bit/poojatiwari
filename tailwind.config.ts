@@ -8,15 +8,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        /* Editorial palette */
+        cream: "#FAF7F2",
+        background: "#FAF7F2",
+        charcoal: "#1A1A1A",
+        ink: "#1A1A1A",
+        pearl: "#1A1A1A",
         primary: {
-          DEFAULT: "#6366f1",
-          dark: "#4f46e5",
-          hover: "#818cf8",
+          DEFAULT: "#0D7377",
+          dark: "#0A5A5E",
+          hover: "#149CA1",
         },
         teal: {
-          DEFAULT: "#2dd4bf",
-          dark: "#14b8a6",
+          DEFAULT: "#0D7377",
+          dark: "#0A5A5E",
         },
+        burgundy: {
+          DEFAULT: "#800020",
+          dark: "#5E0018",
+        },
+        accent: "#800020",
+        muted: "#6F6A62",
+        line: "rgba(26,26,26,0.10)",
+        "line-strong": "rgba(26,26,26,0.18)",
+        surface: "#FFFFFF",
+        "surface-strong": "#F2EDE4",
+        card: "rgba(255,255,255,0.72)",
+        /* Retained dark tokens for the admin console */
         obsidian: {
           DEFAULT: "#050505",
           900: "#070708",
@@ -24,30 +42,25 @@ const config: Config = {
           700: "#101013",
           600: "#16161a",
         },
-        background: "#050505",
-        surface: "rgba(255,255,255,0.02)",
-        "surface-strong": "rgba(255,255,255,0.04)",
-        ink: "#ededed",
-        pearl: "#fafafa",
-        muted: "#9b9ba3",
-        line: "rgba(255,255,255,0.08)",
-        "line-strong": "rgba(255,255,255,0.16)",
+        "surface-dark": "rgba(255,255,255,0.02)",
+        "surface-dark-strong": "rgba(255,255,255,0.04)",
         rowalt: "rgba(255,255,255,0.02)",
         rowhover: "rgba(255,255,255,0.05)",
-        danger: "#f87171",
-        dangerbg: "rgba(248,113,113,0.10)",
-        success: "#34d399",
+        danger: "#B23B3B",
+        dangerbg: "rgba(178,59,59,0.10)",
+        success: "#2E7D6B",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
-        serif: ["var(--font-instrument)", "Georgia", "serif"],
+        serif: ["var(--font-playfair)", "Georgia", "serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       boxShadow: {
-        sm: "0 1px 2px 0 rgba(0,0,0,0.4)",
-        card: "0 1px 3px 0 rgba(0,0,0,0.4), 0 8px 24px -12px rgba(0,0,0,0.6)",
-        "card-hover": "0 12px 40px -12px rgba(99,102,241,0.25)",
-        glow: "0 0 40px -8px rgba(99,102,241,0.45)",
+        sm: "0 1px 2px 0 rgba(26,26,26,0.08)",
+        card: "0 1px 3px 0 rgba(26,26,26,0.08), 0 18px 40px -28px rgba(26,26,26,0.35)",
+        "card-hover": "0 24px 60px -28px rgba(13,115,119,0.35)",
+        glow: "0 0 40px -8px rgba(13,115,119,0.45)",
+        "soft-lg": "0 30px 80px -40px rgba(26,26,26,0.45)",
       },
       borderRadius: {
         lg: "0.75rem",
@@ -56,13 +69,13 @@ const config: Config = {
         "3xl": "1.75rem",
       },
       maxWidth: {
-        content: "72rem",
+        content: "76rem",
       },
       backgroundImage: {
-        "accent-gradient": "linear-gradient(135deg, #2dd4bf 0%, #6366f1 55%, #3b82f6 100%)",
-        "mesh-1": "radial-gradient(circle at 20% 20%, rgba(99,102,241,0.35), transparent 60%)",
-        "mesh-2": "radial-gradient(circle at 80% 30%, rgba(45,212,191,0.28), transparent 55%)",
-        "mesh-3": "radial-gradient(circle at 50% 80%, rgba(139,92,246,0.30), transparent 60%)",
+        "accent-gradient": "linear-gradient(135deg, #0D7377 0%, #800020 100%)",
+        "teal-gradient": "linear-gradient(135deg, #0D7377 0%, #149CA1 100%)",
+        "mesh-1": "radial-gradient(circle at 20% 20%, rgba(13,115,119,0.18), transparent 60%)",
+        "mesh-2": "radial-gradient(circle at 80% 30%, rgba(128,0,32,0.12), transparent 55%)",
       },
       keyframes: {
         "fade-up": {
@@ -86,7 +99,7 @@ const config: Config = {
           "0%,100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-12px)" },
         },
-        "spin-slow": {
+        spin: {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
@@ -98,10 +111,10 @@ const config: Config = {
       animation: {
         "fade-up": "fade-up 0.5s ease-out both",
         "fade-in": "fade-in 0.6s ease-out both",
-        marquee: "marquee 18s linear infinite",
+        marquee: "marquee 28s linear infinite",
         "mesh-drift": "mesh-drift 24s ease-in-out infinite",
         float: "float 6s ease-in-out infinite",
-        "spin-slow": "spin-slow 40s linear infinite",
+        spin: "spin 40s linear infinite",
         shimmer: "shimmer 3s linear infinite",
       },
     },

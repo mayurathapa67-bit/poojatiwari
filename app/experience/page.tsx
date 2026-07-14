@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import ExperienceView from "./ExperienceView";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Experience | Pooja Tiwari",
   description:
-    "Work experience of Pooja Tiwari — AI Solutions Architect & Full-Stack Developer.",
+    "Writing and content career of Pooja Tiwari — Content Writer & Copywriter.",
 };
 
 export default function Page() {

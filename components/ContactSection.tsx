@@ -2,26 +2,26 @@
 
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin } from "lucide-react";
-import type { Contact } from "@/lib/types";
+import type { ContactInfo } from "@/lib/types";
 import SectionHeading from "./SectionHeading";
 import ContactForm from "./ContactForm";
 
-export default function ContactSection({ contact }: { contact: Contact }) {
+export default function ContactSection({ contact }: { contact: ContactInfo }) {
   const cards = [
     { icon: Mail, label: "Email", value: contact.email, href: `mailto:${contact.email}` },
     { icon: Phone, label: "Phone", value: contact.phone, href: `tel:${contact.phone}` },
-    { icon: MapPin, label: "Melbourne, AU", value: contact.locationAU, href: null },
-    { icon: MapPin, label: "Jhapa, NP", value: contact.locationNP, href: null },
+    { icon: MapPin, label: "Based in", value: contact.location, href: null },
   ];
 
   return (
-    <section id="contact" className="section-pad">
+    <section id="contact" className="section-pad bg-cream">
       <div className="container-px">
         <SectionHeading
           eyebrow="Contact"
           title={
             <>
-              Let&apos;s build <span className="serif-accent">together</span>
+              Let&apos;s write something{" "}
+              <span className="serif-accent">worth reading</span>
             </>
           }
         />
@@ -36,15 +36,15 @@ export default function ContactSection({ contact }: { contact: Contact }) {
           >
             {cards.map((card) => {
               const content = (
-                <div className="glass group flex items-start gap-4 p-5 transition-colors hover:border-white/15">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-teal transition-colors group-hover:text-primary">
+                <div className="glass group flex items-start gap-4 p-5 transition-colors hover:border-line-strong">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-line bg-white/70 text-primary transition-colors group-hover:text-burgundy">
                     <card.icon size={18} />
                   </span>
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wider text-muted">
                       {card.label}
                     </p>
-                    <p className="mt-0.5 text-sm font-medium text-ink">{card.value}</p>
+                    <p className="mt-0.5 break-words text-sm font-medium text-ink">{card.value}</p>
                   </div>
                 </div>
               );

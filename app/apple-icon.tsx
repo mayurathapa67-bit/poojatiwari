@@ -19,10 +19,10 @@ export default async function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#050505",
+          background: "#FAF7F2",
           borderRadius: 40,
-          border: "2px solid rgba(255,255,255,0.14)",
-          boxShadow: "0 0 60px rgba(59,130,246,0.25)",
+          border: "2px solid rgba(26,26,26,0.14)",
+          boxShadow: "0 0 60px rgba(13,115,119,0.25)",
         }}
       >
         <div
@@ -32,7 +32,7 @@ export default async function AppleIcon() {
             fontWeight: 600,
             letterSpacing: "-3px",
             fontFamily: "Inter",
-            backgroundImage: "linear-gradient(135deg, #3b82f6 0%, #10b981 100%)",
+            backgroundImage: "linear-gradient(135deg, #0D7377 0%, #800020 100%)",
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             color: "transparent",

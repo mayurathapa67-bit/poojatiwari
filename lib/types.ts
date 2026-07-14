@@ -1,31 +1,38 @@
-export interface ImageSet {
-  original: string;
-  thumb?: string;
-  medium?: string;
-  large?: string;
+export type WritingCategory =
+  | "Blog Posts"
+  | "SEO Content"
+  | "Website Copy"
+  | "Technical Writing"
+  | "Creative Writing";
+
+export interface NavLink {
+  label: string;
+  href: string;
 }
 
-export interface PersonalInfo {
-  name: string;
-  profession: string;
-  phone: string;
-  email: string;
-  locationAU: string;
-  locationNP: string;
-  bio: string;
-  avatar: ImageSet;
+export interface Nav {
+  logo: string;
+  links: NavLink[];
+}
+
+export interface CtaLink {
+  label: string;
+  href: string;
 }
 
 export interface Hero {
   title: string;
-  subtitle: string;
-  ctaText: string;
+  role: string;
+  tagline: string;
+  cta_primary: CtaLink;
+  cta_secondary: CtaLink;
+  image: string;
 }
 
-export interface About {
-  heading: string;
+export interface ExpertiseArea {
+  id: number;
+  title: string;
   description: string;
-  skills: string[];
 }
 
 export interface ExperienceItem {
@@ -36,36 +43,93 @@ export interface ExperienceItem {
   description: string;
 }
 
-export interface ProjectItem {
+export interface About {
+  headline: string;
+  bio: string;
+  philosophy: string;
+  expertise: ExpertiseArea[];
+  experience: ExperienceItem[];
+  certifications: string[];
+  image: string;
+}
+
+export interface Service {
   id: number;
   title: string;
   description: string;
-  tech: string[];
-  link: string;
-  image: ImageSet;
+  icon: string;
+  price?: string;
+  features: string[];
 }
 
-export interface Contact {
-  heading: string;
-  email: string;
-  phone: string;
-  locationAU: string;
-  locationNP: string;
+export interface WritingSample {
+  id: number;
+  title: string;
+  category: WritingCategory;
+  excerpt: string;
+  content: string;
+  client?: string;
+  published_date: string;
+  read_time: number;
+  featured_image: string;
+  featured?: boolean;
+}
+
+export interface BlogPost {
+  id: number;
+  title: string;
+  excerpt: string;
+  content: string;
+  published_date: string;
+  read_time: number;
+  category: string;
+  featured_image: string;
+}
+
+export interface Testimonial {
+  id: number;
+  quote: string;
+  name: string;
+  role: string;
+  company: string;
+  avatar: string;
 }
 
 export interface Socials {
   github: string;
   linkedin: string;
   twitter: string;
+  instagram: string;
+}
+
+export interface PersonalInfo {
+  name: string;
+  profession: string;
+  email: string;
+  phone: string;
+  location: string;
+  avatar: string;
+}
+
+export interface ContactInfo {
+  heading: string;
+  email: string;
+  phone: string;
+  location: string;
+  socials: Socials;
 }
 
 export interface PortfolioData {
-  personalInfo: PersonalInfo;
+  personal: PersonalInfo;
+  nav: Nav;
   hero: Hero;
   about: About;
+  services: Service[];
+  portfolio: WritingSample[];
+  blog: BlogPost[];
   experience: ExperienceItem[];
-  projects: ProjectItem[];
-  contact: Contact;
+  testimonials: Testimonial[];
+  contact: ContactInfo;
   socials: Socials;
 }
 
