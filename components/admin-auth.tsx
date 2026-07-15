@@ -25,7 +25,12 @@ export function useAdminAuth() {
   }, []);
 
   const login = useCallback((pw: string) => {
-    if (pw === ADMIN_PASSWORD) {
+    console.log("[admin-auth] Password check:", {
+      inputLength: pw.length,
+      expectedLength: ADMIN_PASSWORD.length,
+      hasEnvVar: !!process.env.NEXT_PUBLIC_ADMIN_PASSWORD,
+    });
+    if (pw.trim() === ADMIN_PASSWORD.trim()) {
       localStorage.setItem(AUTH_KEY, "1");
       document.cookie = `${AUTH_KEY}=1; path=/; max-age=${60 * 60 * 24 * 7}; samesite=strict`;
       setAuthed(true);

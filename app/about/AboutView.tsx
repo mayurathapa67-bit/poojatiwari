@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AboutSection from "@/components/AboutSection";
 import Experience from "@/components/Experience";
+import SectionBoundary from "@/components/SectionBoundary";
 import type {
   PersonalInfo,
   Nav,
@@ -31,8 +32,12 @@ export default function AboutView() {
   return (
     <main className="min-h-screen bg-cream pt-24">
       <Navbar personal={personal} links={nav.links} />
-      <AboutSection about={about} personal={personal} />
-      <Experience experience={experience} />
+      <SectionBoundary name="About">
+        <AboutSection about={about} personal={personal} />
+      </SectionBoundary>
+      <SectionBoundary name="Experience">
+        <Experience experience={experience} />
+      </SectionBoundary>
       <Footer contact={contact} />
     </main>
   );

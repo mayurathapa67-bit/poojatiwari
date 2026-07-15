@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import fs from 'fs/promises'
-import path from 'path'
+import { readDB } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,22 +8,12 @@ export async function GET(request: Request) {
   const section = searchParams.get('section')
 
   try {
-    const dbPath = path.join(process.cwd(), 'data', 'db.json')
-    const seedPath = path.join(process.cwd(), 'data', 'seed.json')
-
-    let data
-    try {
-      const dbData = await fs.readFile(dbPath, 'utf-8')
-      data = JSON.parse(dbData)
-    } catch {
-      const seedData = await fs.readFile(seedPath, 'utf-8')
-      data = JSON.parse(seedData)
-    }
+    const db = await readDB()
 
     if (section) {
-      return NextResponse.json(data[section] || {})
+      return NextResponse.json(db[section] || {})
     }
-    return NextResponse.json(data)
+    return NextResponse.json(db)
   } catch (error) {
     console.error('[API Read error]:', error)
     return NextResponse.json({ error: 'Failed to read' }, { status: 500 })

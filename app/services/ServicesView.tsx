@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ServicesGrid from "@/components/ServicesGrid";
 import SectionHeading from "@/components/SectionHeading";
+import SectionBoundary from "@/components/SectionBoundary";
 import type { PersonalInfo, Nav, Service, ContactInfo } from "@/lib/types";
 
 const PROCESS = [
@@ -44,7 +45,9 @@ export default function ServicesView() {
             }
             subtitle="Flexible engagements for brands that care about the words."
           />
-          <ServicesGrid services={services} />
+          <SectionBoundary name="Services">
+            <ServicesGrid services={services} />
+          </SectionBoundary>
         </div>
       </section>
 

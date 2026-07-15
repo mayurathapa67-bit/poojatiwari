@@ -4,6 +4,7 @@ import { useJson } from "@/lib/hooks";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Experience from "@/components/Experience";
+import SectionBoundary from "@/components/SectionBoundary";
 import type { PersonalInfo, Nav, ExperienceItem, ContactInfo } from "@/lib/types";
 
 export default function ExperienceView() {
@@ -23,7 +24,9 @@ export default function ExperienceView() {
   return (
     <main className="min-h-screen bg-cream pt-24">
       <Navbar personal={personal} links={nav.links} />
-      <Experience experience={experience} />
+      <SectionBoundary name="Experience">
+        <Experience experience={experience} />
+      </SectionBoundary>
       <Footer contact={contact} />
     </main>
   );

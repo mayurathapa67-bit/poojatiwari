@@ -32,7 +32,7 @@ export async function GET(
     return NextResponse.json({ error: "Invalid section" }, { status: 400 });
   }
   try {
-    const db = (await readDB()) as PortfolioData;
+    const db = (await readDB()) as unknown as PortfolioData;
     const sectionData = resolveSection(section, db);
     return NextResponse.json(sectionData);
   } catch (err) {
@@ -59,7 +59,11 @@ export async function POST(
       publishMode?: "draft" | "local" | "publish";
     };
 
-    if (password !== ADMIN_PASSWORD) {
+    console.log("[content/section] Password check:", {
+      hasEnvVar: !!(process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD),
+      inputLength: password?.length ?? 0,
+    });
+    if (password?.trim() !== ADMIN_PASSWORD?.trim()) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -74,19 +78,19 @@ export async function POST(
       return NextResponse.json({ success: true, state: "draft" });
     }
 
-    const db = (await readDB()) as PortfolioData;
-    (db as Record<SectionKey, unknown>)[section] = data;
+    const db = (await readDB()) as unknown as PortfolioData;
+    (db as unknown as Record<SectionKey, unknown>)[section] = data;
     clearDraft(section);
 
     if (publishMode === "local") {
       const isVercel = process.env.VERCEL === "1" || process.env.VERCEL_ENV != null;
       if (!isVercel) {
-        await writeDB(db);
+        await writeDB(db as unknown as Record<string, unknown>);
       }
       return NextResponse.json({ success: true, state: "local", github: false });
     }
 
-    const result = await writeDB(db, "all");
+    const result = await writeDB(db as unknown as Record<string, unknown>, "all");
 
     const routes: Record<string, string> = {
       personal: "/",

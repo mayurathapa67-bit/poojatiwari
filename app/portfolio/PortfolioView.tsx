@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WritingSampleCard from "@/components/WritingSampleCard";
 import SectionHeading from "@/components/SectionHeading";
+import SectionBoundary from "@/components/SectionBoundary";
 import type {
   PersonalInfo,
   Nav,
@@ -61,6 +62,7 @@ export default function PortfolioView() {
     <main className="min-h-screen bg-cream pt-24">
       <Navbar personal={personal} links={nav.links} />
 
+      <SectionBoundary name="Portfolio">
       <section className="section-pad bg-cream">
         <div className="container-px">
           <SectionHeading
@@ -120,6 +122,7 @@ export default function PortfolioView() {
           )}
         </div>
       </section>
+      </SectionBoundary>
 
       <Footer contact={contact} />
     </main>

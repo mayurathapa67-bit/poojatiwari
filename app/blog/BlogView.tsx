@@ -7,6 +7,7 @@ import { useJson } from "@/lib/hooks";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SectionHeading from "@/components/SectionHeading";
+import SectionBoundary from "@/components/SectionBoundary";
 import type { PersonalInfo, Nav, BlogPost, ContactInfo } from "@/lib/types";
 import { imageSrc, formatDate } from "@/lib/utils";
 
@@ -30,6 +31,7 @@ export default function BlogView() {
     <main className="min-h-screen bg-cream pt-24">
       <Navbar personal={personal} links={nav.links} />
 
+      <SectionBoundary name="Blog">
       <section className="section-pad bg-cream">
         <div className="container-px">
           <SectionHeading
@@ -125,6 +127,7 @@ export default function BlogView() {
           </div>
         </div>
       </section>
+      </SectionBoundary>
 
       <Footer contact={contact} />
     </main>

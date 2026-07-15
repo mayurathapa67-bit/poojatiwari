@@ -11,6 +11,7 @@ import WritingSampleCard from "@/components/WritingSampleCard";
 import TestimonialsCarousel from "@/components/TestimonialsCarousel";
 import BlogPreview from "@/components/BlogPreview";
 import SectionHeading from "@/components/SectionHeading";
+import SectionBoundary from "@/components/SectionBoundary";
 import type {
   PersonalInfo,
   Nav,
@@ -49,7 +50,9 @@ export default function HomeView() {
       <Navbar personal={personal} links={nav.links} />
       <Hero hero={hero} personal={personal} />
       <TypographyShowcase />
-      <AboutSection about={about} personal={personal} />
+      <SectionBoundary name="About">
+        <AboutSection about={about} personal={personal} />
+      </SectionBoundary>
 
       <section id="writing" className="section-pad bg-surface-strong">
         <div className="container-px">
@@ -78,9 +81,15 @@ export default function HomeView() {
         </div>
       </section>
 
-      <ServicesGrid services={services} />
-      <TestimonialsCarousel testimonials={testimonials} />
-      <BlogPreview posts={blog} />
+      <SectionBoundary name="Services">
+        <ServicesGrid services={services} />
+      </SectionBoundary>
+      <SectionBoundary name="Testimonials">
+        <TestimonialsCarousel testimonials={testimonials} />
+      </SectionBoundary>
+      <SectionBoundary name="Blog">
+        <BlogPreview posts={blog} />
+      </SectionBoundary>
 
       <section className="section-pad bg-cream">
         <div className="container-px">

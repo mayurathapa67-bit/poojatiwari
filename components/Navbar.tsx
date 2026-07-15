@@ -16,7 +16,16 @@ export default function Navbar({
   links: NavLink[];
 }) {
   const [open, setOpen] = useState(false);
-  const safeLinks = Array.isArray(links) ? links : [];
+  const safeLinks =
+    Array.isArray(links) && links.length > 0
+      ? links
+      : [
+          { label: "Home", href: "/" },
+          { label: "About", href: "/about" },
+          { label: "Services", href: "/services" },
+          { label: "Writing", href: "/portfolio" },
+          { label: "Contact", href: "/contact" },
+        ];
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">

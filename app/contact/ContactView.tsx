@@ -4,6 +4,7 @@ import { useJson } from "@/lib/hooks";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ContactSection from "@/components/ContactSection";
+import SectionBoundary from "@/components/SectionBoundary";
 import type { PersonalInfo, Nav, ContactInfo } from "@/lib/types";
 
 export default function ContactView() {
@@ -22,7 +23,9 @@ export default function ContactView() {
   return (
     <main className="min-h-screen bg-cream pt-24">
       <Navbar personal={personal} links={nav.links} />
-      <ContactSection contact={contact} />
+      <SectionBoundary name="Contact">
+        <ContactSection contact={contact} />
+      </SectionBoundary>
       <Footer contact={contact} />
     </main>
   );
