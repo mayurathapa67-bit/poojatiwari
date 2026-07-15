@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { readDB, writeDB, readDrafts, writeDrafts, clearDraft } from "@/lib/db";
+import { resolveSection } from "@/lib/defaults";
 import type { PortfolioData, SectionKey } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -22,16 +23,6 @@ const VALID_SECTIONS: SectionKey[] = [
   "socials",
 ];
 
-// Sections whose content is an array. When missing we must return `[]` rather
-// than `{}`, otherwise the client crashes calling `.filter`/`.map` on `{}`.
-const ARRAY_SECTIONS: SectionKey[] = [
-  "services",
-  "portfolio",
-  "blog",
-  "experience",
-  "testimonials",
-];
-
 export async function GET(
   _req: NextRequest,
   { params }: { params: { section: string } }
@@ -42,14 +33,11 @@ export async function GET(
   }
   try {
     const db = (await readDB()) as PortfolioData;
-    const sectionData = db[section as keyof PortfolioData];
-    if (sectionData === undefined || sectionData === null) {
-      return NextResponse.json(ARRAY_SECTIONS.includes(section) ? [] : {}, { status: 200 });
-    }
+    const sectionData = resolveSection(section, db);
     return NextResponse.json(sectionData);
   } catch (err) {
     console.error("[content/section] GET failed:", err);
-    return NextResponse.json(ARRAY_SECTIONS.includes(section) ? [] : {}, { status: 200 });
+    return NextResponse.json(resolveSection(section, {}), { status: 200 });
   }
 }
 
