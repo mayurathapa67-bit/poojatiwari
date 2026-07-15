@@ -18,7 +18,7 @@ const PROCESS = [
 export default function ServicesView() {
   const { data: personal } = useJson<PersonalInfo>("/api/content/personal");
   const { data: nav } = useJson<Nav>("/api/content/nav");
-  const { data: services } = useJson<Service[]>("/api/content/services");
+  const { data: services } = useJson<Service[]>("/api/content/services", []);
   const { data: contact } = useJson<ContactInfo>("/api/content/contact");
 
   if (!personal || !nav || !services || !contact) {

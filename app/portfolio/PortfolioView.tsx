@@ -29,7 +29,7 @@ const CATEGORIES: ("All" | WritingCategory)[] = [
 export default function PortfolioView() {
   const { data: personal } = useJson<PersonalInfo>("/api/content/personal");
   const { data: nav } = useJson<Nav>("/api/content/nav");
-  const { data: portfolio } = useJson<WritingSample[]>("/api/content/portfolio");
+  const { data: portfolio } = useJson<WritingSample[]>("/api/content/portfolio", []);
   const { data: contact } = useJson<ContactInfo>("/api/content/contact");
 
   const [category, setCategory] = useState<"All" | WritingCategory>("All");

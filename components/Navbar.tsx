@@ -16,6 +16,7 @@ export default function Navbar({
   links: NavLink[];
 }) {
   const [open, setOpen] = useState(false);
+  const safeLinks = Array.isArray(links) ? links : [];
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">
@@ -35,7 +36,7 @@ export default function Navbar({
         </Link>
 
         <ul className="relative z-10 hidden items-center gap-1 md:flex">
-          {links.map((item) => (
+          {safeLinks.map((item) => (
             <li key={item.href}>
               <Magnetic strength={0.3}>
                 <Link
@@ -81,7 +82,7 @@ export default function Navbar({
             className="pointer-events-auto absolute top-[68px] w-[calc(100%-2rem)] max-w-5xl overflow-hidden rounded-2xl border border-line bg-white/90 shadow-soft-lg backdrop-blur-xl md:hidden"
           >
             <ul className="flex flex-col p-2">
-              {links.map((item) => (
+              {safeLinks.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}

@@ -9,7 +9,7 @@ import type { PersonalInfo, Nav, ExperienceItem, ContactInfo } from "@/lib/types
 export default function ExperienceView() {
   const { data: personal } = useJson<PersonalInfo>("/api/content/personal");
   const { data: nav } = useJson<Nav>("/api/content/nav");
-  const { data: experience } = useJson<ExperienceItem[]>("/api/content/experience");
+  const { data: experience } = useJson<ExperienceItem[]>("/api/content/experience", []);
   const { data: contact } = useJson<ContactInfo>("/api/content/contact");
 
   if (!personal || !nav || !experience || !contact) {

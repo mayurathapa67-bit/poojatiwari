@@ -22,6 +22,16 @@ const VALID_SECTIONS: SectionKey[] = [
   "socials",
 ];
 
+// Sections whose content is an array. When missing we must return `[]` rather
+// than `{}`, otherwise the client crashes calling `.filter`/`.map` on `{}`.
+const ARRAY_SECTIONS: SectionKey[] = [
+  "services",
+  "portfolio",
+  "blog",
+  "experience",
+  "testimonials",
+];
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: { section: string } }
@@ -32,11 +42,14 @@ export async function GET(
   }
   try {
     const db = (await readDB()) as PortfolioData;
-    const sectionData = db[section as keyof PortfolioData] || {};
+    const sectionData = db[section as keyof PortfolioData];
+    if (sectionData === undefined || sectionData === null) {
+      return NextResponse.json(ARRAY_SECTIONS.includes(section) ? [] : {}, { status: 200 });
+    }
     return NextResponse.json(sectionData);
   } catch (err) {
     console.error("[content/section] GET failed:", err);
-    return NextResponse.json({}, { status: 200 });
+    return NextResponse.json(ARRAY_SECTIONS.includes(section) ? [] : {}, { status: 200 });
   }
 }
 

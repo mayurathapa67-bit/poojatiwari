@@ -15,6 +15,8 @@ export default function AboutSection({
   personal: PersonalInfo;
 }) {
   const image = imageSrc(about.image) || imageSrc(personal.avatar);
+  const expertise = Array.isArray(about.expertise) ? about.expertise : [];
+  const certifications = Array.isArray(about.certifications) ? about.certifications : [];
 
   return (
     <section id="about" className="section-pad bg-cream">
@@ -68,7 +70,7 @@ export default function AboutSection({
               Areas of Expertise
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
-              {about.expertise.map((area) => (
+              {expertise.map((area) => (
                 <div
                   key={area.id}
                   className="rounded-2xl border border-line bg-white/60 p-5 shadow-sm transition-all hover:border-line-strong hover:shadow-card"
@@ -79,13 +81,13 @@ export default function AboutSection({
               ))}
             </div>
 
-            {about.certifications.length > 0 && (
+            {certifications.length > 0 && (
               <div className="mt-8">
                 <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted">
                   <Award size={16} className="text-primary" /> Certifications
                 </h3>
                 <div className="flex flex-wrap gap-2.5">
-                  {about.certifications.map((cert) => (
+                  {certifications.map((cert) => (
                     <span
                       key={cert}
                       className="rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-xs font-medium text-ink"

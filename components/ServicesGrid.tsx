@@ -21,6 +21,7 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 export default function ServicesGrid({ services }: { services: Service[] }) {
+  const safeServices = Array.isArray(services) ? services : [];
   return (
     <section id="services" className="section-pad bg-cream">
       <div className="container-px">
@@ -35,8 +36,9 @@ export default function ServicesGrid({ services }: { services: Service[] }) {
         />
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service, idx) => {
+          {safeServices.map((service, idx) => {
             const Icon = ICONS[service.icon] ?? PenLine;
+            const features = Array.isArray(service.features) ? service.features : [];
             return (
               <motion.article
                 key={service.id}
@@ -54,9 +56,9 @@ export default function ServicesGrid({ services }: { services: Service[] }) {
                   {service.description}
                 </p>
 
-                {service.features.length > 0 && (
+                {features.length > 0 && (
                   <ul className="mt-5 space-y-1.5">
-                    {service.features.map((f) => (
+                    {features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-sm text-ink/80">
                         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                         {f}

@@ -11,6 +11,7 @@ export default function Experience({
 }: {
   experience: ExperienceItem[];
 }) {
+  const safeExperience = Array.isArray(experience) ? experience : [];
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -43,7 +44,7 @@ export default function Experience({
           />
 
           <div className="space-y-10">
-            {experience.map((item, idx) => (
+            {safeExperience.map((item, idx) => (
               <TimelineNode key={item.id} item={item} idx={idx} />
             ))}
           </div>

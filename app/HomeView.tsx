@@ -28,10 +28,10 @@ export default function HomeView() {
   const { data: nav } = useJson<Nav>("/api/content/nav");
   const { data: hero } = useJson<HeroType>("/api/content/hero");
   const { data: about } = useJson<About>("/api/content/about");
-  const { data: services } = useJson<Service[]>("/api/content/services");
-  const { data: portfolio } = useJson<WritingSample[]>("/api/content/portfolio");
-  const { data: blog } = useJson<BlogPost[]>("/api/content/blog");
-  const { data: testimonials } = useJson<Testimonial[]>("/api/content/testimonials");
+  const { data: services } = useJson<Service[]>("/api/content/services", []);
+  const { data: portfolio } = useJson<WritingSample[]>("/api/content/portfolio", []);
+  const { data: blog } = useJson<BlogPost[]>("/api/content/blog", []);
+  const { data: testimonials } = useJson<Testimonial[]>("/api/content/testimonials", []);
   const { data: contact } = useJson<ContactInfo>("/api/content/contact");
 
   if (!personal || !nav || !hero || !about || !services || !portfolio || !blog || !testimonials || !contact) {

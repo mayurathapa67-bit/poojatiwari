@@ -13,7 +13,7 @@ import { imageSrc, formatDate } from "@/lib/utils";
 export default function BlogView() {
   const { data: personal } = useJson<PersonalInfo>("/api/content/personal");
   const { data: nav } = useJson<Nav>("/api/content/nav");
-  const { data: blog } = useJson<BlogPost[]>("/api/content/blog");
+  const { data: blog } = useJson<BlogPost[]>("/api/content/blog", []);
   const { data: contact } = useJson<ContactInfo>("/api/content/contact");
 
   if (!personal || !nav || !blog || !contact) {

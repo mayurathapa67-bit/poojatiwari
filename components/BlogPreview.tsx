@@ -9,7 +9,8 @@ import { imageSrc, formatDate } from "@/lib/utils";
 import SectionHeading from "./SectionHeading";
 
 export default function BlogPreview({ posts }: { posts: BlogPost[] }) {
-  const latest = posts.slice(0, 3);
+  const safePosts = Array.isArray(posts) ? posts : [];
+  const latest = safePosts.slice(0, 3);
 
   return (
     <section id="blog" className="section-pad bg-cream">

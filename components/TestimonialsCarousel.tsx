@@ -12,6 +12,7 @@ export default function TestimonialsCarousel({
 }: {
   testimonials: Testimonial[];
 }) {
+  const safeTestimonials = Array.isArray(testimonials) ? testimonials : [];
   const trackRef = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
 
@@ -34,9 +35,9 @@ export default function TestimonialsCarousel({
     }
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [paused, testimonials.length]);
+  }, [paused, safeTestimonials.length]);
 
-  const loop = [...testimonials, ...testimonials];
+  const loop = [...safeTestimonials, ...safeTestimonials];
 
   return (
     <section className="section-pad bg-surface-strong">
