@@ -31,8 +31,9 @@ export async function GET(
     return NextResponse.json({ error: "Invalid section" }, { status: 400 });
   }
   try {
-    const db = await readDB();
-    return NextResponse.json(db[section]);
+    const db = (await readDB()) as PortfolioData;
+    const sectionData = db[section as keyof PortfolioData] || {};
+    return NextResponse.json(sectionData);
   } catch (err) {
     console.error("[content/section] GET failed:", err);
     return NextResponse.json({}, { status: 200 });
@@ -72,8 +73,8 @@ export async function POST(
       return NextResponse.json({ success: true, state: "draft" });
     }
 
-    const db = await readDB();
-    (db[section] as PortfolioData[SectionKey]) = data as PortfolioData[SectionKey];
+    const db = (await readDB()) as PortfolioData;
+    (db as Record<SectionKey, unknown>)[section] = data;
     clearDraft(section);
 
     if (publishMode === "local") {
@@ -101,7 +102,11 @@ export async function POST(
     };
     if (routes[section]) revalidatePath(routes[section]);
 
-    return NextResponse.json({ success: true, state: "published", ...result });
+    return NextResponse.json({
+      success: true,
+      state: "published",
+      ...(typeof result === "object" && result ? result : {}),
+    });
   } catch (err) {
     console.error("[content/section] POST failed:", err);
     return NextResponse.json(
